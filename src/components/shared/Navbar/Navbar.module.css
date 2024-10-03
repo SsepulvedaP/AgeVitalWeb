@@ -1,0 +1,15 @@
+.Wrapper {
+    position: absolute;
+    z-index: 100;
+    background-color: var(--color-purple);
+    width: 100px;
+    height: 100vh;
+}
+
+.Nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
