@@ -21,7 +21,9 @@ const Navbar = () => {
         <HomeIcon className={styles.Icon} />
         </NavLink>
         <Person2Icon className={styles.Icon} />
+        <NavLink to={'/admin'} >
         <QueryStatsIcon className={styles.Icon} />
+        </NavLink>
         <NavLink to={'/mapa'}>
         <PlaceIcon className={styles.Icon} />
         </NavLink>

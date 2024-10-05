@@ -1,0 +1,53 @@
+.cardContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: px; 
+}
+.card {
+    margin-top: 20px;
+    margin-left: 20px;
+    width: 250px;
+    height: 150px;
+    border-radius: 15px;
+    margin-right: 40px;
+}
+  
+.circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: 12px;
+  }
+  
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+.flexContainer {
+    display: flex;
+    align-items: center;
+    justify-content: right; 
+    flex-grow: 1;
+  }
+
+.marginRight {
+    margin-right: px; 
+    margin-left: 55px;
+  }
+
+.activo {
+    background-color: green;
+  }
+  
+.inactivo {
+    background-color: red;
+  }
+  
+.dañado {
+    background-color: purple;
+  }
+
+  
