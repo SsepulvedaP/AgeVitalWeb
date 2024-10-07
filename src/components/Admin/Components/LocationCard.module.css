@@ -1,16 +1,13 @@
-.cardContent {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: px; 
-}
+
 .card {
-    margin-top: 20px;
-    margin-left: 20px;
-    width: 250px;
-    height: 150px;
-    border-radius: 15px;
-    margin-right: 40px;
+  margin-top: 20px;
+   margin-left: 20px;
+  width: 250px;
+  height: 150px;
+  border-radius: 15px;
+  background-size: cover; 
+  background-position: center; 
+    position: relative; 
 }
   
 .circle {
@@ -36,18 +33,18 @@
 .marginRight {
     margin-right: px; 
     margin-left: 55px;
-  }
+}
 
 .activo {
     background-color: green;
-  }
+}
   
 .inactivo {
-    background-color: red;
-  }
+  background-color: red;
+}
   
 .dañado {
-    background-color: purple;
-  }
+  background-color: purple;
+}
 
   

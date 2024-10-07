@@ -1,30 +1,73 @@
-import React from 'react'
+import React, { useState } from 'react';
 import SensorMeasurement from './Components/SensorMeasurement';
-import styles from './Admin.module.css'
+import SensorModal from './SensorModal';
+import styles from './Admin.module.css';
 
 function Admin() {
-  // Datos de ejemplo para las tarjetas
-  const temperatureCards = [
-    { nombreId: 'ID_12345', ubicacion: 'Edificio A', estado: 'activo' },
-    { nombreId: 'ID_67890', ubicacion: 'Edificio B', estado: 'inactivo' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado' },
+  const [temperatureCards, setTemperatureCards] = useState([
+    { nombreId: 'ID_12345', ubicacion: 'Edificio A', estado: 'activo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
+    { nombreId: 'ID_67890', ubicacion: 'Edificio B', estado: 'inactivo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
+    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' }
+  ]);
 
-  ];
+  const [humidityCards, setHumidityCards] = useState([
+    { nombreId: 'ID_54321', ubicacion: 'Edificio D', estado: 'activo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
+    { nombreId: 'ID_98765', ubicacion: 'Edificio E', estado: 'inactivo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' }
+  ]);
 
-  const humidityCards = [
-    { nombreId: 'ID_54321', ubicacion: 'Edificio D', estado: 'activo' },
-    { nombreId: 'ID_98765', ubicacion: 'Edificio E', estado: 'inactivo' },
-    // Agrega más datos si es necesario
-  ];
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedSensor, setSelectedSensor] = useState(null);
+
+  const handleOpenModal = (sensor) => {
+    setSelectedSensor(sensor);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedSensor(null);
+  };
+
+  const handleUpdateSensor = (updatedSensor) => {
+    const updateCards = (cards) =>
+      cards.map((card) =>
+        card.nombreId === updatedSensor.nombreId ? updatedSensor : card
+      );
+  
+    setTemperatureCards((prevCards) => updateCards(prevCards));
+    setHumidityCards((prevCards) => updateCards(prevCards));
+    
+    handleCloseModal();
+  };
+
   return (
     <div className={styles.measurement}>
-      <SensorMeasurement titulo="Temperatura" cardsData={temperatureCards} />
-      <SensorMeasurement titulo="Humedad" cardsData={humidityCards} />
+      {/* Componente que muestra las tarjetas de temperatura */}
+      <SensorMeasurement 
+        titulo="Temperatura" 
+        cardsData={temperatureCards} 
+        handleOpenModal={handleOpenModal} 
+      />
+
+      {/* Componente que muestra las tarjetas de humedad */}
+      <SensorMeasurement 
+        titulo="Humedad" 
+        cardsData={humidityCards} 
+        handleOpenModal={handleOpenModal} 
+      />
+
+      {/* Modal para editar el sensor */}
+      {selectedSensor && (
+        <SensorModal 
+          open={openModal} 
+          handleClose={handleCloseModal} 
+          nombreId={selectedSensor.nombreId}
+          ubicacion={selectedSensor.ubicacion}
+          estado={selectedSensor.estado}
+          imagenurl={selectedSensor.imagenurl}
+          handleUpdate={handleUpdateSensor}
+        />
+      )}
     </div>
   );
 }
