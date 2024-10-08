@@ -49,5 +49,20 @@
     color: white;
     text-transform: none;
 }
-  
+
+.roundButtonsContainer {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.roundButton {
+  width: 60px;
+  height: 60px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
   

@@ -40,6 +40,16 @@ function Admin() {
     handleCloseModal();
   };
 
+  const handleDeleteSensor = (nombreId) => {
+    // Filtrar los sensores eliminando el que coincide con el nombreId
+    const filterCards = (cards) => cards.filter((card) => card.nombreId !== nombreId);
+
+    setTemperatureCards((prevCards) => filterCards(prevCards));
+    setHumidityCards((prevCards) => filterCards(prevCards));
+    
+    handleCloseModal(); // Cerrar el modal después de eliminar
+  };
+
   return (
     <div className={styles.measurement}>
       {/* Componente que muestra las tarjetas de temperatura */}
@@ -66,6 +76,7 @@ function Admin() {
           estado={selectedSensor.estado}
           imagenurl={selectedSensor.imagenurl}
           handleUpdate={handleUpdateSensor}
+          handleDelete={handleDeleteSensor} 
         />
       )}
     </div>
