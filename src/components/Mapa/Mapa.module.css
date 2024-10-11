@@ -1,0 +1,31 @@
+.Wrapper{
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    right: 30px;
+}
+
+.leaflet-container {
+    height: 100vh;
+    width: 100vw;
+    z-index: 10;
+}
+
+
+.request-popup :global .leaflet-popup-content-wrapper {
+    border-radius: 15px;
+    background-color: #C7A1E4;
+    border-color: #9B51E0;
+    border: 3px solid;
+    width: 250px;
+    height: 200px;
+    padding: 15px;
+  }
+
+.request-popup :global .leaflet-popup-close-button, .request-popup :global .leaflet-popup-tip {
+    display: none;
+}
+
+.request-popup{
+    font-size: 18px;
+}
