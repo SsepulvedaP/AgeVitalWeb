@@ -1,0 +1,139 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .home-container {
+    width: 100%;
+    text-align: center;
+  }
+  
+  /* Sección 1 */
+  .section1 {
+    background-color: #f9f9f9;
+    padding: 40px;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    color: #333;
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    margin: 10px 0 20px;
+    color: #666;
+  }
+  
+  .enter-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .section1-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+  }
+  
+  /* Sección 2 */
+  .section2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 40px;
+    background-color: #fff;
+  }
+  
+  .benefits {
+    flex: 1;
+    text-align: left;
+  }
+  
+  .icons-section {
+    display: flex;
+    justify-content: space-around;
+    flex: 1;
+  }
+  
+  .icon-item {
+    text-align: center;
+    padding: 0 10px;
+  }
+  
+  .icon-item img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .icon-item h3 {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  /* Sección de imágenes */
+  .images-section {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background-color: #f0f0f0;
+  }
+  
+  .images-section img {
+    width: 23%;
+    height: auto;
+  }
+  
+  /* Sección 3 */
+  .section3 {
+    padding: 40px;
+    background-color: #fff;
+  }
+  
+  .features {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .feature-item {
+    width: 30%;
+    padding: 10px;
+  }
+  
+  .feature-item h3 {
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .feature-item p {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  /* Footer */
+  .footer {
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .footer nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+  
+  .footer nav a:hover {
+    text-decoration: underline;
+  }
+  
