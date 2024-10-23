@@ -17,7 +17,10 @@ AgeVital+ es un proyecto orientado a la monitorización de la salud de adultos m
 
 ## Instalación
 
-Instructions on how to install and set up the project locally. Include any prerequisites, dependencies, and commands needed to get started.
+Instrucciones sobre como instalar el proyecto de manera local y poder interactuar con los diferentes contenidos.
+
+> [!CAUTION]
+> Solicitar permisos necesarios para agregarlo como colaborador.
 
 ```bash
 # Example command to clone the repository
