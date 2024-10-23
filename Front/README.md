@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+> [!IMPORTANT]
+> FrontEnd AgeVital UPB
+# AgeVital+
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+AgeVital+ es un proyecto orientado a la monitorización de la salud de adultos mayores mediante el uso de tecnologías IoT. A través de sensores no invasivos, se recopilan datos vitales y ambientales, permitiendo la detección temprana de factores de riesgo y enfermedades silenciosas. El frontend facilita la visualización y gestión de estos datos, brindando una interfaz amigable y accesible para los usuarios.
 
-## Available Scripts
+> [!NOTE]
+> Contenidos
+## Tabla de contenidos
 
-In the project directory, you can run:
+- [Instalación](#instalación)
+- [Uso](#uso)
+- [Contenidos](#contenidos)
+- [Contribución](#contribución)
+- [Licecia](#licencia)
+- [Contacto](#contacto)
 
-### `npm start`
+## Instalación
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Instructions on how to install and set up the project locally. Include any prerequisites, dependencies, and commands needed to get started.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+# Example command to clone the repository
+git clone https://github.com/username/repo.git
 
-### `npm test`
+# Navigate into the project directory
+cd repo
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Install dependencies
+npm install
+```
+## Uso
+```bash
+#Run command
+npm run start
+```
+> [!TIP]
+> Componentes y paginas
+## Contenidos
+- Home page: Pagina introductoria sobre lo que es AgeVital y los topicos tratados en el proyecto, junto con sus beneficios y diferentes secciones de información para el usuario.
+- Mapa Interactivo: Muestra la ubicación de los sensores en el campus de la universidad, con tags tipo nube que permiten ver información específica de cada sensor, como la humedad y temperatura.
 
-### `npm run build`
+- Visualización de Sensores: Sección con tarjetas que presentan el estado actual de cada sensor (activo, inactivo, dañado), incluyendo su ID, ubicación y tipo de sensor.
+- Monitoreo en Tiempo Real: Permite a los usuarios observar las variables capturadas por los sensores de manera actualizada, facilitando la toma de decisiones basada en los datos.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Contribución
+```bash
+#Haz un fork del proyecto.
+#Crea una rama para tu feature
+git checkout -b feature/AmazingFeature
+#Realiza los cambios necesarios y haz un commit
+git commit -m 'Add some AmazingFeature'
+#Sube tus cambios a la rama
+git push origin feature/AmazingFeature
+#Abre un Pull Request
+```
+## Licencia
+Este proyecto esta bajo las politicas de privacidad y protección de la Universidad Pontificia Bolivariana.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+> [!TIP]
+> Estudiantes del proyecto
+## Contacto
+- Samuel Santa Jaramillo - samuel.santaj@upb.edu.co
+- Mateo González Tobón - mateo.gonzalezt@upb.edu.co
+- Sebastián Sepúlveda Patiño - sebastian.sepulvedap@upb.edu.co
+- Valeria Paola Padilla Hoyos - valeria.padillah@upb.edu.co
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
