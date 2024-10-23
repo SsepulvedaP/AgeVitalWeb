@@ -1,5 +1,5 @@
 .Wrapper {
-    position: absolute;
+    position: fixed;
     z-index: 100;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
