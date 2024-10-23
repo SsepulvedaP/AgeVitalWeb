@@ -23,13 +23,13 @@ Instrucciones sobre como instalar el proyecto de manera local y poder interactua
 > Solicitar permisos necesarios para agregarlo como colaborador.
 
 ```bash
-# Example command to clone the repository
-git clone https://github.com/username/repo.git
+# Comando de ejemplo para clonar el proyecto.
+git clone https://github.com/SsepulvedaP/AgeVitalWeb.git
 
-# Navigate into the project directory
+# Navegar dentro del proyecto.
 cd repo
 
-# Install dependencies
+# Instalar dependencias.
 npm install
 ```
 ## Uso
