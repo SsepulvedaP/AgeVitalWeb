@@ -1,17 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, Popup } from "react-leaflet";
 
 //styles
 import styles from "./Mapa.module.css";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
+import { getTrial } from "services/getTrial";
 
 const Mapa = () => {
+  const [data, setData] = useState({});
   const position = [6.242391, -75.589642];
   const bounds = [
     [6.244529, -75.592128],
     [6.239687, -75.586238],
   ];
+
+  const getTrialData = async () => {
+    const data = await getTrial();
+    setData(data);
+  };
+  useEffect(() => {
+    getTrialData();
+  }, []);
 
   function Boundaries() {
     const map = useMap();
@@ -38,7 +48,7 @@ const Mapa = () => {
         />
         <Marker icon={customIcon} position={position}>
           <Popup className={styles["request-popup"]}>
-            <p>Sensor Humedad</p>
+            <p>Sensor {data.Sensor}</p>
             <ul>
               <li>80 g/m3</li>
               <li>27/09/24 16:18:20</li>
