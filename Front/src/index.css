@@ -3,6 +3,10 @@ html {
   font-family: "Poppins", sans-serif;
   margin-left: 50px;
   --color-purple: #C7A1E4;
+  --color-principal: #057B6D;
+  --color-secundario: #CAF3F0;
+  --color-green: #9DDB96;
+  --color-aqua: #00C8C8;
 }
 
 body {

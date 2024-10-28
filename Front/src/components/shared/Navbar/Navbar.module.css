@@ -3,14 +3,14 @@
     z-index: 100;
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
-    background-color: var(--color-purple);
-    width: 100px;
+    background-color: var(--color-principal);
+    width: 70px;
     height: 100vh;
-    left: -80px;
+    left: -60px;
     transition: left 0.3s ease;
 
     a {
-        color: black;
+        color: var(--color-secundario);
     }
 }
 
@@ -29,7 +29,7 @@
 
 .Icon {
     margin: 30px 0;
-    scale: 2;
+    scale: 1.5;
 }
 
 .Icon:hover {
@@ -38,7 +38,8 @@
 
 .Exit{
     margin: 25px 0;
-    scale: 2;
+    color: var(--color-secundario);
+    scale: 1.5;
     margin-top: auto;
 }
 
