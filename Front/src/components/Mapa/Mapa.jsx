@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, Popup } from "react-leaflet";
+import InsertChartOutlinedRoundedIcon from '@mui/icons-material/InsertChartOutlinedRounded';
+import { NavLink } from 'react-router-dom';
 
 //styles
 import styles from "./Mapa.module.css";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { getTrial } from "services/getTrial";
-import SensorCard from './Sensorcard'
+import SensorCard from './Sensorcard';
 
 const Mapa = () => {
   const [data, setData] = useState({});
@@ -20,6 +22,7 @@ const Mapa = () => {
     const data = await getTrial();
     setData(data);
   };
+  
   useEffect(() => {
     getTrialData();
   }, []);
@@ -36,20 +39,24 @@ const Mapa = () => {
 
   return (
     <section className={styles.Wrapper}>
+      <NavLink to={'/ecovilla'}>
+        <button className={styles.openBocetoButton}><InsertChartOutlinedRoundedIcon /></button>
+      </NavLink>
+
       <MapContainer
         bounds={bounds}
         zoom={20}
-        zoomControl={false}
+        zoomControl={true}
         scrollWheelZoom={false}
-        className={styles["leaflet-container"]}
+        className={styles.leafletContainer}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles courtesy of <a href="https://www.openstreetmap.cat" target="_blank">Breton OpenStreetMap Team</a>'
           url="https://tile.openstreetmap.bzh/ca/{z}/{x}/{y}.png"
         />
         <Marker icon={customIcon} position={position}>
-          <Popup >
-          <SensorCard />
+          <Popup>
+            <SensorCard />
           </Popup>
         </Marker>
         <Boundaries />
