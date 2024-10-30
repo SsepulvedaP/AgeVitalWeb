@@ -1,3 +1,7 @@
+from flask_bcrypt import Bcrypt
+from auth import auth_bp
+from config_db import Config  
+from flask_jwt_extended import JWTManager
 from flask import Flask,jsonify,request 
 from flask_cors import CORS, cross_origin
 from models import db
@@ -15,14 +19,26 @@ with app.app_context():
     
 app.register_blueprint(api, url_prefix='/api')
 
-@app.route('/trial', methods = ['GET']) 
-def ReturnJSON(): 
-    if(request.method == 'GET'): 
-        data = { 
-            "Sensor" : "Temperature", 
-            "Value" : 22.4, 
-        }
-        return jsonify(data) 
-  
-if __name__=='__main__': 
+# Configuración de la base de datos y JWT
+app.config.from_object(Config)
+db.init_app(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+
+# Crea las tablas en la base de datos si no existen
+with app.app_context():
+    db.create_all()
+
+# Registro del blueprint de autenticación
+app.register_blueprint(auth_bp, url_prefix='/auth')
+
+@app.route('/trial', methods=['GET'])
+def ReturnJSON():
+    data = {
+        "Sensor": "Temperature",
+        "Value": 22.4,
+    }
+    return jsonify(data)
+
+if __name__ == '__main__':
     app.run(debug=True)
