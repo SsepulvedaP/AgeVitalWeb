@@ -19,7 +19,7 @@ def read_data():
         SELECT temperatura, humedadrelativa
         FROM "doc"."etvariables"
         WHERE entity_id = 'UnidaddeMedida1'
-        LIMIT 10;
+        LIMIT 5;
         """
         cursor.execute(query)
         rows = cursor.fetchall()
