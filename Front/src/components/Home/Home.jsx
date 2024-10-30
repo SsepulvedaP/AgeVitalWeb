@@ -5,6 +5,7 @@ import homeImage2 from './image2.png';
 import corazon from './corazon.png';
 import estrella from './estrella.png';
 import reloj from './reloj.png';
+import { NavLink } from 'react-router-dom';
 
 const Home = () => {
   return (
@@ -13,7 +14,9 @@ const Home = () => {
       <section className="section1">
         <h1 className="title">Monitoreo Inteligente para un<br /> Envejecimiento Saludable</h1>
         <p className="description">AgeVital+ utiliza tecnología IoT para monitorear<br /> tu salud física y mental en tiempo real.</p>
-        <button className="enter-button">Ingresar</button>
+        <NavLink to={'/login'} >
+          <button className="enter-button">Ingresar</button>
+        </NavLink>
         <img src={homeImage} alt="Imagen1" className="section1-image" />
       </section>
 
