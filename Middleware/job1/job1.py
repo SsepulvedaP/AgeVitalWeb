@@ -22,9 +22,9 @@ def read_data():
         last_24_hours = int(time.time() - 24 * 3600)
         
         query = """
-        SELECT entity_id, temperatura, humedadrelativa, ruido, timeindex
+        SELECT entity_id, temperatura, humedadrelativa, ruido, time_index
         FROM "doc"."etvariables"
-        WHERE timeindex >= ?
+        WHERE time_index >= ?
         """
         cursor.execute(query, (last_24_hours,))
         rows = cursor.fetchall()
@@ -54,8 +54,8 @@ def clean_data(df):
     return grouped
 
 # Carga
-def load_data_to_postgres(df):
-    engine = create_engine('postgresql://username:password@host:port/Datos_AgeSensors')
+def load_data_to_postgres(df, conn):  
+    cur = conn.cursor()
 
     tipo_medicion_map = {
         'temperatura': 1,
@@ -63,20 +63,16 @@ def load_data_to_postgres(df):
         'ruido': 3
     }
 
-    with engine.connect() as conn:
-        for index, row in df.iterrows():
-            for measure_type, tipo_id in tipo_medicion_map.items():
-                max_col = f'medida_maxima_{measure_type[:4]}'
-                min_col = f'medida_minima_{measure_type[:4]}'
-                avg_col = f'medida_promedio_{measure_type[:4]}'
-                
-                conn.execute("""
-                    INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
-                    VALUES (%s, %s, CURRENT_DATE, %s, %s, %s)
-                """, (
-                    row['entity_id'], tipo_id, 
-                    row[max_col], row[min_col], row[avg_col]
-                ))
+
+    for index, row in df.iterrows():
+        for measure_type, tipo_id in tipo_medicion_map.items():
+            max_col = f'medida_maxima_{measure_type[:4]}'
+            min_col = f'medida_minima_{measure_type[:4]}'
+            avg_col = f'medida_promedio_{measure_type[:4]}'
+
+            values = row['entity_id'], tipo_id, time.time(), row[max_col], row[min_col], row[avg_col]
+            cur.execute("INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio) VALUES (%s, %s, %s, %s, %s, %s)", values
+            )
 
 def main():
     data = read_data()
@@ -88,7 +84,16 @@ def main():
     
     df = clean_data(df)
     
+    conn = psycopg2.connect(database = "datos_agesensors",
+                        user = "postgres",
+                        password = "upb123",
+                        host = "127.0.0.1",
+                        port = "5432")
+
     load_data_to_postgres(df)
+
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
    main()
