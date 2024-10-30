@@ -5,7 +5,16 @@ api = Blueprint('api', __name__)
 
 @api.route('/sensores', methods=['GET'])
 def get_sensores():
-    sensores = Sensores.query.all()
+    sensores = db.session.query(
+        Sensores.id_sensor,
+        Sensores.nombre,
+        Sensores.estado,
+        Sensores.ubicacion,
+        Sensores.fecha_instalacion,
+        TipoMedicion.nombre_tipo
+    ).join(SensorMedicion, Sensores.id_sensor == SensorMedicion.id_sensor)\
+     .join(TipoMedicion, SensorMedicion.id_tipo_medicion == TipoMedicion.id_tipo_medicion).all()
+
     result = []
     for sensor in sensores:
         result.append({
@@ -13,7 +22,8 @@ def get_sensores():
             'nombre': sensor.nombre,
             'estado': sensor.estado,
             'ubicacion': sensor.ubicacion,
-            'fecha_instalacion': sensor.fecha_instalacion
+            'fecha_instalacion': sensor.fecha_instalacion,
+            'tipo': sensor.nombre_tipo            
         })
     return jsonify(result)
 
