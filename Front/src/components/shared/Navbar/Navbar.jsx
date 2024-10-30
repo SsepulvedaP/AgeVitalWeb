@@ -11,6 +11,7 @@ import PlaceIcon from '@mui/icons-material/Place';
 import ViewInArRoundedIcon from '@mui/icons-material/ViewInArRounded';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SensorOccupiedRoundedIcon from '@mui/icons-material/SensorOccupiedRounded';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 
 const Navbar = () => {
   const location = useLocation();
@@ -34,6 +35,9 @@ const Navbar = () => {
         </NavLink>
         <NavLink to={'/usuarios'}>
         <SensorOccupiedRoundedIcon className={styles.Icon} />
+        </NavLink>
+        <NavLink to={'/dashboard'}>
+        <DashboardRoundedIcon className={styles.Icon} />
         </NavLink>
         <ExitToAppIcon className={styles.Exit} />
         </nav>

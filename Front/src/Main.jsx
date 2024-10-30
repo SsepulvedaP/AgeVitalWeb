@@ -8,6 +8,8 @@ import Admin from "components/Admin/Admin";
 import Tresd from "components/Tresd/Tresd";
 import Usuarios from "components/Usuarios/Usuarios";
 import Login from "components/Login/Login";
+import Dashboard from "components/Dashboard/Dashboard";
+
 
 function Main() {
   return (
@@ -20,6 +22,7 @@ function Main() {
         <Route path="/tresd" exact element={<Tresd />} />
         <Route path="/usuarios" exact element={<Usuarios />} />
         <Route path="/login" exact element={<Login />} />
+        <Route path="/dashboard" exact element={<Dashboard />} />
       </Routes>
     </>
   );

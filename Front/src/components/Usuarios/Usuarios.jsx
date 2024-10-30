@@ -70,7 +70,7 @@ const Usuarios = () => {
 
     return (
         <div className="gestion">
-            <h2 className="title">Gestión de Usuarios</h2>
+            <h2>Gestión de Usuarios</h2>
             {/* Formulario para agregar o editar usuario */}
             <div className="formulario" >
                 <form onSubmit={isEditing ? handleUpdateUser : handleAddUser}>
