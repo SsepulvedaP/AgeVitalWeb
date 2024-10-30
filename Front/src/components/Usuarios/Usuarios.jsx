@@ -3,12 +3,14 @@ import "./Usuarios.css";
 
 const Usuarios = () => {
     const [usuarios, setUsuarios] = useState([
-        { id: 1, nombre: 'Admin', email: 'admin@example.com' },
-        { id: 2, nombre: 'User1', email: 'user1@example.com' }
+        { id: 1, nombre: 'Admin', email: 'admin@example.com', rol: 'Admin' },
+        { id: 2, nombre: 'User1', email: 'user1@example.com', rol: 'Auxiliar' }
     ]);
+
     const [id, setId] = useState('');
     const [nombre, setNombre] = useState('');
     const [email, setEmail] = useState('');
+    const [rol, setRol] = useState('Admin'); // Estado para el campo Rol
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
@@ -26,12 +28,12 @@ const Usuarios = () => {
         const newUser = {
             id: parseInt(id),
             nombre,
-            email
+            email,
+            rol
         };
         setUsuarios([...usuarios, newUser]);
         resetForm();
     };
-
 
     const handleEditUser = (user) => {
         setIsEditing(true);
@@ -39,6 +41,7 @@ const Usuarios = () => {
         setId(user.id);
         setNombre(user.nombre);
         setEmail(user.email);
+        setRol(user.rol);
     };
 
     const handleUpdateUser = (e) => {
@@ -50,7 +53,7 @@ const Usuarios = () => {
 
         setUsuarios(
             usuarios.map((user) =>
-                user.id === editId ? { ...user, nombre, email } : user
+                user.id === editId ? { ...user, nombre, email, rol } : user
             )
         );
         resetForm();
@@ -64,6 +67,7 @@ const Usuarios = () => {
         setId('');
         setNombre('');
         setEmail('');
+        setRol('Admin'); // Resetear el rol al valor por defecto
         setIsEditing(false);
         setEditId(null);
     };
@@ -71,11 +75,12 @@ const Usuarios = () => {
     return (
         <div className="gestion">
             <h2>Gestión de Usuarios</h2>
+
             {/* Formulario para agregar o editar usuario */}
-            <div className="formulario" >
+            <div className="formulario">
                 <form onSubmit={isEditing ? handleUpdateUser : handleAddUser}>
                     <input
-                        type="id"
+                        type="text"
                         placeholder="ID"
                         value={id}
                         onChange={(e) => setId(e.target.value)}
@@ -95,10 +100,17 @@ const Usuarios = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
+                    <select
+                        value={rol}
+                        onChange={(e) => setRol(e.target.value)}
+                        required
+                    >
+                        <option value="Admin">Admin</option>
+                        <option value="Auxiliar">Auxiliar</option>
+                    </select>
                     <button type="submit">{isEditing ? 'Actualizar' : 'Agregar'}</button>
                 </form>
             </div>
-
 
             {/* Tabla de usuarios */}
             <table>
@@ -107,6 +119,7 @@ const Usuarios = () => {
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Email</th>
+                        <th>Rol</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -116,6 +129,7 @@ const Usuarios = () => {
                             <td>{user.id}</td>
                             <td>{user.nombre}</td>
                             <td>{user.email}</td>
+                            <td>{user.rol}</td>
                             <td>
                                 <div className="button-container">
                                     <button className="button edit" onClick={() => handleEditUser(user)}>Editar</button>
