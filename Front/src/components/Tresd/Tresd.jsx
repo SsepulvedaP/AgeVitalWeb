@@ -9,7 +9,6 @@ const Tresd = () => {
   return (
     <div className="tresd-container">
       <button className="open-3d-button" onClick={openNewTab}><ThreeDRotationRoundedIcon /></button>
-      
     </div>
   );
 };
