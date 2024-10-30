@@ -1,6 +1,6 @@
 from flask_bcrypt import Bcrypt
 from auth import auth_bp
-from config_db import Config  
+from Back.config_db_users import Config  
 from flask_jwt_extended import JWTManager
 from flask import Flask,jsonify,request 
 from flask_cors import CORS, cross_origin
