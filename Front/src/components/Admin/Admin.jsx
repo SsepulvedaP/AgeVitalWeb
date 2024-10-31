@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import SensorMeasurement from './Components/SensorMeasurement';
 import SensorModal from './SensorModal';
 import styles from './Admin.module.css';
 
 function Admin() {
-  const [temperatureCards, setTemperatureCards] = useState([
-    { nombreId: 'ID_12345', ubicacion: 'Edificio A', estado: 'activo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
-    { nombreId: 'ID_67890', ubicacion: 'Edificio B', estado: 'inactivo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
-    { nombreId: 'ID_11121', ubicacion: 'Edificio C', estado: 'dañado', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' }
-  ]);
-
-  const [humidityCards, setHumidityCards] = useState([
-    { nombreId: 'ID_54321', ubicacion: 'Edificio D', estado: 'activo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' },
-    { nombreId: 'ID_98765', ubicacion: 'Edificio E', estado: 'inactivo', imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg' }
-  ]);
-
+  const [temperatureCards, setTemperatureCards] = useState([]);
+  const [humidityCards, setHumidityCards] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedSensor, setSelectedSensor] = useState(null);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5000/api/sensores')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        const temperatureSensors = data
+          .filter(sensor => sensor.tipo === 'TEMPERATURA')
+          .map(sensor => ({
+            nombreId: sensor.nombre,
+            ubicacion: sensor.ubicacion,
+            estado: sensor.estado.toLowerCase(), // Ej. 'activo', 'inactivo'
+            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+          }));
+
+        const humiditySensors = data
+          .filter(sensor => sensor.tipo === 'HUMEDAD')
+          .map(sensor => ({
+            nombreId: sensor.nombre,
+            ubicacion: sensor.ubicacion,
+            estado: sensor.estado.toLowerCase(),
+            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+          }));
+
+        setTemperatureCards(temperatureSensors);
+        setHumidityCards(humiditySensors);
+      })
+      .catch(error => console.error('Error al obtener los datos:', error));
+  }, []);
 
   const handleOpenModal = (sensor) => {
     setSelectedSensor(sensor);

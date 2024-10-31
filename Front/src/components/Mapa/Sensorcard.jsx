@@ -1,15 +1,16 @@
 import React from 'react';
 import './Sensorcard.css';
 
-function SensorCard() {
+function SensorCard({sensor}) {
     return (
         <div className="sensor-card">
             <div className="sensor-status">
                 <span className="sensor-title">Sensor</span>
-                <span className="status-badge">Activo
+                <span className={`status-badge ${sensor.estado === 'Activo' ? 'activo' : sensor.estado === 'Dañado' ? 'dañado' : 'desactivado'}`}>
+                    {sensor.estado === 'Activo' ? 'Activo' : sensor.estado === 'Dañado' ? 'Dañado' : 'Desactivado'}
                 </span>
             </div>
-            <h1 className="sensor-name">Humedad</h1>
+            <h1 className="sensor-name">{sensor.tipo}</h1>
             <hr />
             <div className="sensor-info">
                 <div className="info-row-sub">
@@ -19,8 +20,8 @@ function SensorCard() {
                 </div>
                 <div className="info-row">
                     <span>70%</span>
-                    <span>100%</span>
-                    <span>0%</span>
+                    <span>{sensor.medida_maxima}</span>
+                    <span>{sensor.medida_minima}</span>
                 </div>
                 <div className="info-row-sub">
                     <span>Fecha</span>
@@ -34,7 +35,7 @@ function SensorCard() {
                 </div>
                 <div className="info-row-id">
                     <p className="sensor-id-tittle">Id del sensor: </p>
-                    <p className="sensor-id"> 51588</p>
+                    <p className="sensor-id"> {sensor.nombre}</p>
                 </div>
 
             </div>

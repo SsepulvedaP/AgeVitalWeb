@@ -37,7 +37,7 @@ const LocationCard = ({ nombreId, ubicacion, estado, imagenurl,handleOpenModal }
         <CardContent className={styles.cardContent}>
         <Box className={styles.header}>
             <Box>
-              <Typography variant="h6" component="div">
+              <Typography variant="h10" component="div">
                 {nombreId}
               </Typography>
 
