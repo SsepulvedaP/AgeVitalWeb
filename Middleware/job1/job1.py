@@ -28,7 +28,6 @@ def read_data():
         """
         cursor.execute(query, (time.time()-86400,))
         rows = cursor.fetchall()
-        print(rows)
         return rows
     finally:
         cursor.close()
@@ -39,19 +38,25 @@ def clean_data(df):
     temp_valid = (df['temperatura'] >= 0) & (df['temperatura'] <= 50)
     humidity_valid = (df['humedadrelativa'] >= 0) & (df['humedadrelativa'] <= 100)
     noise_valid = (df['ruido'] >= 0) & (df['ruido'] <= 130)
-    df = df[temp_valid & humidity_valid & noise_valid]
+    
+    df.loc[~temp_valid, 'temperatura'] = pd.NA
+    df.loc[~humidity_valid, 'humedadrelativa'] = pd.NA
+    df.loc[~noise_valid, 'ruido'] = pd.NA
     
     grouped = df.groupby('entity_id').agg(
-        medida_maxima_temp=('temperatura', 'max'),
-        medida_minima_temp=('temperatura', 'min'),
-        medida_promedio_temp=('temperatura', 'mean'),
-        medida_maxima_hum=('humedadrelativa', 'max'),
-        medida_minima_hum=('humedadrelativa', 'min'),
-        medida_promedio_hum=('humedadrelativa', 'mean'),
-        medida_maxima_ruido=('ruido', 'max'),
-        medida_minima_ruido=('ruido', 'min'),
-        medida_promedio_ruido=('ruido', 'mean')
+        medida_maxima_temp=pd.NamedAgg(column='temperatura', aggfunc='max'),
+        medida_minima_temp=pd.NamedAgg(column='temperatura', aggfunc='min'),
+        medida_promedio_temp=pd.NamedAgg(column='temperatura', aggfunc='mean'),
+        medida_maxima_hum=pd.NamedAgg(column='humedadrelativa', aggfunc='max'),
+        medida_minima_hum=pd.NamedAgg(column='humedadrelativa', aggfunc='min'),
+        medida_promedio_hum=pd.NamedAgg(column='humedadrelativa', aggfunc='mean'),
+        medida_maxima_ruido=pd.NamedAgg(column='ruido', aggfunc='max'),
+        medida_minima_ruido=pd.NamedAgg(column='ruido', aggfunc='min'),
+        medida_promedio_ruido=pd.NamedAgg(column='ruido', aggfunc='mean')
     ).reset_index()
+    
+    grouped = grouped.where(pd.notnull(grouped), None)
+
     return grouped
 
 # Carga
