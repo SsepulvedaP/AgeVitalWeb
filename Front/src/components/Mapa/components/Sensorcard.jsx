@@ -2,6 +2,16 @@ import React from 'react';
 import './Sensorcard.css';
 
 function SensorCard({sensor}) {
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        return new Date(dateString).toLocaleDateString('es-CO', options);
+    };
+
+    const formatTime = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false });
+    };
+
     return (
         <div className="sensor-card">
             <div className="sensor-status">
@@ -14,12 +24,12 @@ function SensorCard({sensor}) {
             <hr />
             <div className="sensor-info">
                 <div className="info-row-sub">
-                    <span>Medida</span>
+                    <span>Media</span>
                     <span>Max</span>
                     <span>Min</span>
                 </div>
                 <div className="info-row">
-                    <span>70%</span>
+                    <span>{sensor.medida_promedio}</span>
                     <span>{sensor.medida_maxima}</span>
                     <span>{sensor.medida_minima}</span>
                 </div>
@@ -29,9 +39,9 @@ function SensorCard({sensor}) {
                     <span>Hora</span>
                 </div>
                 <div className="info-row">
-                    <span>2024-03-02</span>
+                    <span>{formatDate(sensor.fecha_instalacion)}</span>
                     <span>5min</span>
-                    <span>3:06</span>
+                    <span>{formatTime(sensor.fecha_instalacion)}</span>
                 </div>
                 <div className="info-row-id">
                     <p className="sensor-id-tittle">Id del sensor: </p>

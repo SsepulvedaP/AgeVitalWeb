@@ -15,7 +15,8 @@ def get_sensores():
         Sensores.fecha_instalacion,
         TipoMedicion.nombre_tipo,
         Mediciones.medida_maxima,
-        Mediciones.medida_minima
+        Mediciones.medida_minima,
+        Mediciones.medida_promedio
     ).join(SensorMedicion, Sensores.id_sensor == SensorMedicion.id_sensor)\
      .join(TipoMedicion, SensorMedicion.id_tipo_medicion == TipoMedicion.id_tipo_medicion)\
      .outerjoin(Mediciones, SensorMedicion.id_sensor == Mediciones.id_sensor).all()  # Usa outerjoin para incluir sensores sin mediciones
@@ -31,7 +32,8 @@ def get_sensores():
             'fecha_instalacion': sensor.fecha_instalacion,
             'tipo': sensor.nombre_tipo,
             'medida_maxima': sensor.medida_maxima,
-            'medida_minima': sensor.medida_minima
+            'medida_minima': sensor.medida_minima,
+            'medida_promedio': sensor.medida_promedio
         })
     return jsonify(result)
 
