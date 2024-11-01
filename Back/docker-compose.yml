@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI="ENTER YOUR DATABASE URI"
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: "ENTER YOUR USER"
+      POSTGRES_PASSWORD: "ENTER YOUR PASSWORD"
+      POSTGRES_DB: "ENTER YOUR DATABASE NAME"
+    ports:
+      - "5435:5432" # Esto mapea el puerto 5432 del contenedor al puerto 5433 de tu máquina
