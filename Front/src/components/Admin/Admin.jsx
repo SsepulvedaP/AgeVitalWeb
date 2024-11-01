@@ -6,6 +6,8 @@ import styles from './Admin.module.css';
 function Admin() {
   const [temperatureCards, setTemperatureCards] = useState([]);
   const [humidityCards, setHumidityCards] = useState([]);
+  const [noiseCards, setNoiseCards] = useState([]); 
+  const [airQualityCards, setAirQualityCards] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedSensor, setSelectedSensor] = useState(null);
 
@@ -13,13 +15,12 @@ function Admin() {
     fetch('http://127.0.0.1:5000/api/sensores')
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         const temperatureSensors = data
           .filter(sensor => sensor.tipo === 'TEMPERATURA')
           .map(sensor => ({
             nombreId: sensor.nombre,
-            ubicacion: sensor.ubicacion,
-            estado: sensor.estado.toLowerCase(), // Ej. 'activo', 'inactivo'
+            ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
+            estado: sensor.estado.toLowerCase(), 
             imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
           }));
 
@@ -27,13 +28,33 @@ function Admin() {
           .filter(sensor => sensor.tipo === 'HUMEDAD')
           .map(sensor => ({
             nombreId: sensor.nombre,
-            ubicacion: sensor.ubicacion,
+            ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
+            estado: sensor.estado.toLowerCase(),
+            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+          }));
+
+        const noiseSensors = data
+          .filter(sensor => sensor.tipo === 'RUIDO')
+          .map(sensor => ({
+            nombreId: sensor.nombre,
+            ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
+            estado: sensor.estado.toLowerCase(),
+            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+          }));
+
+        const airQualitySensors = data
+        .filter(sensor => sensor.tipo === 'CALIDAD_DEL_AIRE')
+        .map(sensor => ({
+            nombreId: sensor.nombre,
+            ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
           }));
 
         setTemperatureCards(temperatureSensors);
         setHumidityCards(humiditySensors);
+        setNoiseCards(noiseSensors);
+        setAirQualityCards(airQualitySensors);
       })
       .catch(error => console.error('Error al obtener los datos:', error));
   }, []);
@@ -56,37 +77,48 @@ function Admin() {
   
     setTemperatureCards((prevCards) => updateCards(prevCards));
     setHumidityCards((prevCards) => updateCards(prevCards));
-    
+    setNoiseCards((prevCards) => updateCards(prevCards));
+    setAirQualityCards((prevCards) => updateCards(prevCards));
+
     handleCloseModal();
   };
 
   const handleDeleteSensor = (nombreId) => {
-    // Filtrar los sensores eliminando el que coincide con el nombreId
     const filterCards = (cards) => cards.filter((card) => card.nombreId !== nombreId);
 
     setTemperatureCards((prevCards) => filterCards(prevCards));
     setHumidityCards((prevCards) => filterCards(prevCards));
+    setNoiseCards((prevCards) => filterCards(prevCards));
+    setAirQualityCards((prevCards) => filterCards(prevCards));
     
-    handleCloseModal(); // Cerrar el modal después de eliminar
+    handleCloseModal(); 
   };
 
   return (
     <div className={styles.measurement}>
-      {/* Componente que muestra las tarjetas de temperatura */}
       <SensorMeasurement 
         titulo="Temperatura" 
         cardsData={temperatureCards} 
         handleOpenModal={handleOpenModal} 
       />
 
-      {/* Componente que muestra las tarjetas de humedad */}
       <SensorMeasurement 
         titulo="Humedad" 
         cardsData={humidityCards} 
         handleOpenModal={handleOpenModal} 
       />
+      <SensorMeasurement
+        titulo="Ruido"
+        cardsData={noiseCards}
+        handleOpenModal={handleOpenModal}
+      />
 
-      {/* Modal para editar el sensor */}
+      <SensorMeasurement
+        titulo="Calidad del Aire"
+        cardsData={airQualityCards}
+        handleOpenModal={handleOpenModal}
+      />
+
       {selectedSensor && (
         <SensorModal 
           open={openModal} 
