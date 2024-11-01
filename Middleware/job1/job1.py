@@ -70,21 +70,19 @@ def load_data_to_postgres(df, conn):
     }
 
     for _, row in df.iterrows():
-        id_sensor = row['entity_id']
+        nombre = row['entity_id']
 
-        cur.execute("SELECT id_sensor FROM Sensores WHERE id_sensor = %s", (id_sensor,))
+        cur.execute("SELECT nombre FROM Sensores WHERE nombre = %s", (nombre,))
         result = cur.fetchone()
 
         if result is None:
             cur.execute("""
-                INSERT INTO Sensores (id_sensor, latitud, longitud, fecha_instalacion)
-                VALUES (%s, %s, %s, CURRENT_DATE) ON CONFLICT (id_sensor) DO NOTHING
-            """, (id_sensor, 6, -75))
-            print(f"Inserted new sensor with id_sensor: {id_sensor}")
+                INSERT INTO Sensores (nombre, estado, latitud, longitud, fecha_instalacion)
+                VALUES (%s, %s, %s, %s, CURRENT_DATE) ON CONFLICT (nombre) DO NOTHING
+            """, (nombre, 'Activo', 6, -75))
+            print(f"Insertado nuevo sensor con nombre: {nombre}")
         else:
-            print(f"Found existing sensor with id_sensor: {id_sensor}")
-
-        current_date = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
+            print(f"Se encontró un sensor existente con el nombre: {nombre}")
 
         for measure_type, (prefix, tipo_id) in tipo_medicion_map.items():
             max_col = f'medida_maxima_{prefix}'
@@ -92,16 +90,18 @@ def load_data_to_postgres(df, conn):
             avg_col = f'medida_promedio_{prefix}'
 
             if pd.notna(row[max_col]) and pd.notna(row[min_col]) and pd.notna(row[avg_col]):
-                values = (id_sensor, tipo_id, current_date, row[max_col], row[min_col], row[avg_col])
+                cur.execute("SELECT id_sensor FROM Sensores WHERE nombre = %s", (nombre,))
+                id_sensor = cur.fetchone()[0]
+                values = (id_sensor, tipo_id, row[max_col], row[min_col], row[avg_col])
 
                 try:
                     cur.execute("""
                         INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
-                        VALUES (%s, %s, %s, %s, %s, %s)
+                        VALUES (%s, %s, CURRENT_DATE, %s, %s, %s)
                     """, values)
-                    print(f"Inserted measurement for sensor {id_sensor} with tipo_id {tipo_id}")
+                    print(f"Insertadas mediciones para sensor {id_sensor} de tipo {tipo_id} con nombre {nombre}")
                 except psycopg2.errors.ForeignKeyViolation as e:
-                    print(f"ForeignKeyViolation: Could not insert measurement for id_sensor {id_sensor}. Error: {e}")
+                    print(f"No se logro insertar mediciones para sensor {id_sensor} con nombre {nombre}. Error: {e}")
                     conn.rollback()
 
 def main():
