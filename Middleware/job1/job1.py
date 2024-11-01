@@ -55,7 +55,9 @@ def clean_data(df):
         medida_promedio_ruido=pd.NamedAgg(column='ruido', aggfunc='mean'),
         medida_maxima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='max'),
         medida_minima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='min'),
-        medida_promedio_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='mean')
+        medida_promedio_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='mean'),
+        lat = pd.NamedAgg(column='lat', aggfunc='first'),
+        lon = pd.NamedAgg(column='lon', aggfunc='first')
     ).reset_index()
     
     grouped = grouped.where(pd.notnull(grouped), None)
@@ -149,7 +151,7 @@ def main():
         print("No hay datos en crate.")
         return
     
-    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'calidadaire', 'time_index'])
+    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'calidadaire', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
     
     conn = psycopg2.connect(database="datos_agesensors",
