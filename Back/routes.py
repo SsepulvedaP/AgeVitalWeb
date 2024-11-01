@@ -10,7 +10,7 @@ def get_sensores():
         Sensores.id_sensor,
         Sensores.nombre,
         Sensores.estado,
-        Sensores.latitud,    # Selecciona directamente la latitud
+        Sensores.latitud,
         Sensores.longitud,
         Sensores.fecha_instalacion,
         TipoMedicion.nombre_tipo,

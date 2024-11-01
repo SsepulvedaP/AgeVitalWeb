@@ -11,18 +11,9 @@ db.init_app(app)
 cors = CORS(app)
 
 with app.app_context():
-    db.create_all()  # Crea las tablas
+    db.create_all()
     
 app.register_blueprint(api, url_prefix='/api')
-
-@app.route('/trial', methods = ['GET']) 
-def ReturnJSON(): 
-    if(request.method == 'GET'): 
-        data = { 
-            "Sensor" : "Temperature", 
-            "Value" : 22.4, 
-        }
-        return jsonify(data) 
   
 if __name__=='__main__': 
     app.run(debug=True)

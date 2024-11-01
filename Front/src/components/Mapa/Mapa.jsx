@@ -7,7 +7,6 @@ import { NavLink } from 'react-router-dom';
 import styles from "./Mapa.module.css";
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
-import { getTrial } from "services/getTrial";
 import SensorCard from './Sensorcard';
 
 const Mapa = () => {
