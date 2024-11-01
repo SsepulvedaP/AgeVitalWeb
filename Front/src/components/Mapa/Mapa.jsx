@@ -22,7 +22,11 @@ const Mapa = () => {
   ];
 
   useEffect(() => {
-    setData(getSensorData());
+    const fetchData = async () => {
+      const result = await getSensorData();
+      setData(result);
+    };
+    fetchData();
   }, []);
 
   function Boundaries() {
