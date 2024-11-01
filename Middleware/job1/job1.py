@@ -3,11 +3,12 @@ import pandas as pd
 from sqlalchemy import create_engine
 import psycopg2
 import time
+from datetime import datetime
 
 # Extracción
 def connect_to_crate():
     try:
-        return client.connect('http://10.38.32.137:4200', username='crate')
+        return client.connect('http://localhost:4200', username='crate')
     except Exception as e:
         print(f"Error al conectar a CrateDB: {e}")
         return None
@@ -58,21 +59,45 @@ def load_data_to_postgres(df, conn):
     cur = conn.cursor()
 
     tipo_medicion_map = {
-        'temperatura': 1,
-        'humedadrelativa': 2,
-        'ruido': 3
+        'temperatura': ('temp', 1),
+        'humedadrelativa': ('hum', 2),
+        'ruido': ('ruido', 3)
     }
 
+    for _, row in df.iterrows():
+        id_sensor = row['entity_id']
 
-    for index, row in df.iterrows():
-        for measure_type, tipo_id in tipo_medicion_map.items():
-            max_col = f'medida_maxima_{measure_type[:4]}'
-            min_col = f'medida_minima_{measure_type[:4]}'
-            avg_col = f'medida_promedio_{measure_type[:4]}'
+        cur.execute("SELECT id_sensor FROM Sensores WHERE id_sensor = %s", (id_sensor,))
+        result = cur.fetchone()
 
-            values = row['entity_id'], tipo_id, time.time(), row[max_col], row[min_col], row[avg_col]
-            cur.execute("INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio) VALUES (%s, %s, %s, %s, %s, %s)", values
-            )
+        if result is None:
+            cur.execute("""
+                INSERT INTO Sensores (id_sensor, latitud, longitud, fecha_instalacion)
+                VALUES (%s, %s, %s, CURRENT_DATE) ON CONFLICT (id_sensor) DO NOTHING
+            """, (id_sensor, 6, -75))
+            print(f"Inserted new sensor with id_sensor: {id_sensor}")
+        else:
+            print(f"Found existing sensor with id_sensor: {id_sensor}")
+
+        current_date = datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
+
+        for measure_type, (prefix, tipo_id) in tipo_medicion_map.items():
+            max_col = f'medida_maxima_{prefix}'
+            min_col = f'medida_minima_{prefix}'
+            avg_col = f'medida_promedio_{prefix}'
+
+            if pd.notna(row[max_col]) and pd.notna(row[min_col]) and pd.notna(row[avg_col]):
+                values = (id_sensor, tipo_id, current_date, row[max_col], row[min_col], row[avg_col])
+
+                try:
+                    cur.execute("""
+                        INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """, values)
+                    print(f"Inserted measurement for sensor {id_sensor} with tipo_id {tipo_id}")
+                except psycopg2.errors.ForeignKeyViolation as e:
+                    print(f"ForeignKeyViolation: Could not insert measurement for id_sensor {id_sensor}. Error: {e}")
+                    conn.rollback()
 
 def main():
     data = read_data()
@@ -84,16 +109,16 @@ def main():
     
     df = clean_data(df)
     
-    conn = psycopg2.connect(database = "datos_agesensors",
-                        user = "postgres",
-                        password = "upb123",
-                        host = "127.0.0.1",
-                        port = "5432")
+    conn = psycopg2.connect(database="datos_agesensors",
+                            user="postgres",
+                            password="upb123",
+                            host="127.0.0.1",
+                            port="5432")
 
-    load_data_to_postgres(df)
+    load_data_to_postgres(df, conn)
 
     conn.commit()
     conn.close()
 
 if __name__ == "__main__":
-   main()
+    main()
