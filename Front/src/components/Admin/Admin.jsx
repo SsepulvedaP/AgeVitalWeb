@@ -1,8 +1,12 @@
 import React, { useState,useEffect } from 'react';
 import SensorMeasurement from './Components/SensorMeasurement';
-import SensorModal from './SensorModal';
-import styles from './Admin.module.css';
+import SensorModal from './Components/SensorModal';
 
+//Services
+import { getSensorData } from 'services/getSensorData';
+
+//Styles
+import styles from './Admin.module.css';
 function Admin() {
   const [temperatureCards, setTemperatureCards] = useState([]);
   const [humidityCards, setHumidityCards] = useState([]);
@@ -10,45 +14,45 @@ function Admin() {
   const [airQualityCards, setAirQualityCards] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedSensor, setSelectedSensor] = useState(null);
+  const image = 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg';
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/sensores')
-      .then(response => response.json())
+    getSensorData()
       .then(data => {
         const temperatureSensors = data
-          .filter(sensor => sensor.tipo === 'TEMPERATURA')
+          .filter(sensor => sensor.tipo === 'temperatura')
           .map(sensor => ({
             nombreId: sensor.nombre,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(), 
-            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+            imagenurl: image
           }));
 
         const humiditySensors = data
-          .filter(sensor => sensor.tipo === 'HUMEDAD')
+          .filter(sensor => sensor.tipo === 'humedadrelativa')
           .map(sensor => ({
             nombreId: sensor.nombre,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
-            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+            imagenurl: image
           }));
 
         const noiseSensors = data
-          .filter(sensor => sensor.tipo === 'RUIDO')
+          .filter(sensor => sensor.tipo === 'ruido')
           .map(sensor => ({
             nombreId: sensor.nombre,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
-            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+            imagenurl: image
           }));
 
         const airQualitySensors = data
-        .filter(sensor => sensor.tipo === 'CALIDAD_DEL_AIRE')
+        .filter(sensor => sensor.tipo === 'calidadaire')
         .map(sensor => ({
             nombreId: sensor.nombre,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
-            imagenurl: 'https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg'
+            imagenurl: image
           }));
 
         setTemperatureCards(temperatureSensors);
