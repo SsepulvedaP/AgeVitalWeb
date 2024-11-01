@@ -20,15 +20,15 @@ def read_data():
     
     cursor = connection.cursor()
     try:
-        last_24_hours = int(time.time() - 24 * 3600)
         
         query = """
         SELECT entity_id, temperatura, humedadrelativa, ruido, time_index
         FROM "doc"."etvariables"
         WHERE time_index >= ?
         """
-        cursor.execute(query, (last_24_hours,))
+        cursor.execute(query, (time.time()-86400,))
         rows = cursor.fetchall()
+        print(rows)
         return rows
     finally:
         cursor.close()
