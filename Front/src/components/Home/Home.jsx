@@ -1,48 +1,50 @@
 import React from 'react';
-import './Home.css'; // Asegúrate de que este archivo exista y tenga los estilos.
+import './Home.css';
 import homeImage from './home1.png';
 import homeImage2 from './image2.png';
-import corazon from './corazon.png';
-import estrella from './estrella.png';
-import reloj from './reloj.png';
 import { NavLink } from 'react-router-dom';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
+import AccessTimeFilledRoundedIcon from '@mui/icons-material/AccessTimeFilledRounded';
 
 const Home = () => {
   return (
     <div className="home-container">
       {/* Sección 1 */}
       <section className="section1">
-        <h1 className="title">Monitoreo Inteligente para un<br /> Envejecimiento Saludable</h1>
-        <p className="description">AgeVital+ utiliza tecnología IoT para monitorear<br /> tu salud física y mental en tiempo real.</p>
-        <NavLink to={'/login'} >
-          <button className="enter-button">Ingresar</button>
-        </NavLink>
-        <img src={homeImage} alt="Imagen1" className="section1-image" />
+        <div className="section1-content">
+          <h1 className="title">Monitoreo Inteligente para un<br /> Envejecimiento Saludable</h1>
+          <p className="description">AgeVital+ utiliza tecnología IoT para monitorear<br /> tu salud física y mental en tiempo real.</p>
+          <NavLink to="/login">
+            <button className="enter-button">Ingresar</button>
+          </NavLink>
+        </div>
+        <img src={homeImage} alt="Imagen principal" className="section1-image" />
       </section>
 
       {/* Sección 2 */}
       <section className="section2">
         <div className="benefits">
-          <h1 className="subtitle">Beneficios <br />Clave</h1>
+          <h1 className="subtitle">Beneficios Clave</h1>
           <p className="text">AgeVital+ conecta sensores no invasivos en el hogar para recopilar datos sobre la salud física y el ambiente. Estos datos son analizados en tiempo real para detectar cualquier anomalía, permitiendo que los usuarios y cuidadores tomen decisiones informadas.</p>
         </div>
         <div className="icons-section">
           <div className="icon-item">
-            <img src={reloj} alt="Icono 1" />
+            <AccessTimeFilledRoundedIcon className="icon" />
             <div className="icon-text">
               <h3>Monitoreo en Tiempo Real</h3>
               <p>Supervisión continua de tu salud.</p>
             </div>
           </div>
           <div className="icon-item">
-            <img src={corazon} alt="Icono 2" />
+            <FavoriteRoundedIcon className="icon" />
             <div className="icon-text">
               <h3>Detección Temprana</h3>
               <p>Identificación de riesgos cardiovasculares.</p>
             </div>
           </div>
           <div className="icon-item">
-            <img src={estrella} alt="Icono 3" />
+            <StarRoundedIcon className="icon" />
             <div className="icon-text">
               <h3>Fácil de Usar</h3>
               <p>Accesible para personas mayores y cuidadores.</p>
@@ -53,12 +55,7 @@ const Home = () => {
 
       {/* Sección de imágenes */}
       <section className="images-section">
-        <img src={homeImage2} alt="Imagen 1" />
-        {/*  
-        <img src="/assets/img2.png" alt="Imagen 2" />
-        <img src="/assets/img3.png" alt="Imagen 3" />
-        <img src="/assets/img4.png" alt="Imagen 4" />
-        */}
+        <img src={homeImage2} alt="Imagen ilustrativa" />
       </section>
 
       {/* Footer */}
