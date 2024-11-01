@@ -5,7 +5,6 @@ api = Blueprint('api', __name__)
 
 @api.route('/sensores', methods=['GET'])
 def get_sensores():
-    # Realiza una consulta para obtener la información del sensor junto con las medidas.
     sensores = db.session.query(
         Sensores.id_sensor,
         Sensores.nombre,
@@ -13,28 +12,33 @@ def get_sensores():
         Sensores.latitud,
         Sensores.longitud,
         Sensores.fecha_instalacion,
-        TipoMedicion.nombre_tipo,
-        Mediciones.medida_maxima,
-        Mediciones.medida_minima,
-        Mediciones.medida_promedio
+        TipoMedicion.nombre_tipo
     ).join(SensorMedicion, Sensores.id_sensor == SensorMedicion.id_sensor)\
      .join(TipoMedicion, SensorMedicion.id_tipo_medicion == TipoMedicion.id_tipo_medicion)\
-     .outerjoin(Mediciones, SensorMedicion.id_sensor == Mediciones.id_sensor).all()  # Usa outerjoin para incluir sensores sin mediciones
+     .all()
 
     result = []
     for sensor in sensores:
+        ultima_medicion = db.session.query(
+            Mediciones.medida_maxima,
+            Mediciones.medida_minima,
+            Mediciones.medida_promedio
+        ).filter(Mediciones.id_sensor == sensor.id_sensor)\
+         .order_by(Mediciones.fecha.desc())\
+         .first()
+
         result.append({
             'id_sensor': sensor.id_sensor,
             'nombre': sensor.nombre,
             'estado': sensor.estado,
-            'latitud': sensor.latitud, 
+            'latitud': sensor.latitud,
             'longitud': sensor.longitud,
             'fecha_instalacion': sensor.fecha_instalacion,
             'tipo': sensor.nombre_tipo,
-            'medida_maxima': sensor.medida_maxima,
-            'medida_minima': sensor.medida_minima,
-            'medida_promedio': sensor.medida_promedio
+            'medida_maxima': ultima_medicion.medida_maxima if ultima_medicion else None,
+            'medida_minima': ultima_medicion.medida_minima if ultima_medicion else None
         })
+
     return jsonify(result)
 
 
