@@ -6,6 +6,10 @@ Front/.vscode/
 Back/__pycache__/
 Back/venv/
 
+# testing
+app.py
+sensor_coords.json
+
 .venv
 /.pnp
 .pnp.js

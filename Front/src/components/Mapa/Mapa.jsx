@@ -47,6 +47,7 @@ const Mapa = () => {
         </button>
       </NavLink>
       <MapContainer
+        bounds={bounds}
         zoom={20}
         center={position}
         zoomControl={true}
