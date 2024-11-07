@@ -1,7 +1,36 @@
 from flask import Blueprint, jsonify
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
+from datetime import datetime, timedelta
 
 api = Blueprint('api', __name__)
+
+@api.route('/globalmetrics', methods=['GET'])
+def get_global_metrics():
+    now = datetime.now()
+    last_24_hours = now - timedelta(hours=24)
+
+    tipos_medicion = db.session.query(TipoMedicion).all()
+    result = []
+
+    for tipo in tipos_medicion:
+        metrics = db.session.query(
+            db.func.min(Mediciones.medida_minima).label('minima'),
+            db.func.max(Mediciones.medida_maxima).label('maxima'),
+            db.func.avg(Mediciones.medida_promedio).label('promedio')
+        ).filter(
+            Mediciones.id_tipo_medicion == tipo.id_tipo_medicion,
+            Mediciones.fecha >= last_24_hours
+        ).first()
+
+        result.append({
+            'tipo_medicion': tipo.nombre_tipo,
+            'minima': metrics.minima,
+            'maxima': metrics.maxima,
+            'promedio': metrics.promedio
+        })
+
+    return jsonify(result)
+
 
 @api.route('/sensores', methods=['GET'])
 def get_sensores():
