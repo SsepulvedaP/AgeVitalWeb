@@ -7,7 +7,7 @@ from datetime import datetime
 # Extraction
 def connect_to_crate():
     try:
-        return client.connect('http://localhost:4200', username='crate')
+        return client.connect('http://10.38.32.137:4200', username='crate')
     except Exception as e:
         print(f"Error al conectar a CrateDB: {e}")
         return None
@@ -20,9 +20,9 @@ def read_data():
     cursor = connection.cursor()
     try:
         query = """
-        SELECT entity_id, temperatura, humedadrelativa, ruido, calidadaire, time_index, lat, lon
+        SELECT entity_id, temperatura, humedadrelativa, ruido, time_index, lat, lon
         FROM "doc"."etvariables"
-        WHERE time_index >= ?
+        WHERE time_index < ?
         """
         cursor.execute(query, (time.time() - 86400,))
         rows = cursor.fetchall()
@@ -36,12 +36,10 @@ def clean_data(df):
     temp_valid = (df['temperatura'] >= 0) & (df['temperatura'] <= 50)
     humidity_valid = (df['humedadrelativa'] >= 0) & (df['humedadrelativa'] <= 100)
     noise_valid = (df['ruido'] >= 0) & (df['ruido'] <= 130)
-    air_quality_valid = (df['calidadaire'] >= 0) & (df['calidadaire'] <= 500)
     
     df.loc[~temp_valid, 'temperatura'] = pd.NA
     df.loc[~humidity_valid, 'humedadrelativa'] = pd.NA
     df.loc[~noise_valid, 'ruido'] = pd.NA
-    df.loc[~air_quality_valid, 'calidadaire'] = pd.NA
     
     grouped = df.groupby('entity_id').agg(
         medida_maxima_temp=pd.NamedAgg(column='temperatura', aggfunc='max'),
@@ -53,9 +51,6 @@ def clean_data(df):
         medida_maxima_ruido=pd.NamedAgg(column='ruido', aggfunc='max'),
         medida_minima_ruido=pd.NamedAgg(column='ruido', aggfunc='min'),
         medida_promedio_ruido=pd.NamedAgg(column='ruido', aggfunc='mean'),
-        medida_maxima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='max'),
-        medida_minima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='min'),
-        medida_promedio_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='mean'),
         lat = pd.NamedAgg(column='lat', aggfunc='first'),
         lon = pd.NamedAgg(column='lon', aggfunc='first')
     ).reset_index()
@@ -73,7 +68,6 @@ def load_data_to_postgres(df, conn):
         'temperatura': 'temp',
         'humedadrelativa': 'hum',
         'ruido': 'ruido',
-        'calidadaire': 'calidadaire'
     }
     
     # Check for or insert types into TipoMedicion
@@ -151,14 +145,14 @@ def main():
         print("No hay datos en crate.")
         return
     
-    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'calidadaire', 'time_index', 'lat', 'lon'])
+    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
     
-    conn = psycopg2.connect(database="datos_agesensors",
-                            user="postgres",
+    conn = psycopg2.connect(database="sensores_db",
+                            user="upb123",
                             password="upb123",
-                            host="127.0.0.1",
-                            port="5432")
+                            host="10.38.32.137",
+                            port="5436")
 
     load_data_to_postgres(df, conn)
 
