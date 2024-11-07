@@ -3,6 +3,13 @@ import './Dashboard.css';
 import InsertChartOutlinedRoundedIcon from '@mui/icons-material/InsertChartOutlinedRounded';
 import { LineChart } from '@mui/x-charts';
 
+// Función para formatear la fecha en MM/DD
+const formatDate = (date) => {
+    const month = date.getMonth() + 1; // Los meses son 0-indexados, por eso se suma 1
+    const day = date.getDate();
+    return `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+};
+
 const renderSensorMetrics = (sensorType, metrics) => (
     <div className={`${sensorType}-metrics`}>
         <h2>{sensorType === 'temperature' ? 'Temperatura' : 'Humedad'}</h2>
@@ -17,15 +24,32 @@ const renderSensorMetrics = (sensorType, metrics) => (
     </div>
 );
 
+const timeData = [
+    new Date(2024, 7, 31),
+    new Date(2024, 7, 31, 12),
+    new Date(2024, 8, 1),
+    new Date(2024, 8, 1, 12),
+    new Date(2024, 8, 2),
+    new Date(2024, 8, 2, 12),
+    new Date(2024, 8, 3),
+    new Date(2024, 8, 3, 12),
+    new Date(2024, 8, 4),
+];
+
+const xAxisCommon = {
+    data: timeData,
+    scaleType: 'time',
+    tickFormatter: (value) => formatDate(new Date(value)), // Aplica el formato MM/DD
+};
+
 const renderCharts = (chartData) => (
     chartData.map((chart, index) => (
         <div className="chart-container" key={`chart-${index}`}>
             <h2>{chart.title}</h2>
             <LineChart
                 xAxis={[{
-                    data: chart.xAxisData.map((_, i) => i), // Usar índices internos
-                    label: 'Tiempo',
-                    tickFormat: (value) => chart.xAxisData[value], // Mostrar etiquetas originales
+                    ...xAxisCommon,
+                    tickMinStep: 3600 * 1000 * 24, // min step: 24h
                 }]}
                 series={chart.series}
                 width={chart.width || 500}
@@ -37,7 +61,7 @@ const renderCharts = (chartData) => (
 
 const Dashboard = () => {
     const openNewTab = () => {
-        window.open('http://localhost:3000/d/de15iqdns3gu8f/age-sensors?orgId=1&refresh=auto', '_blank');
+        window.open('http://10.38.32.137:3000/d/de15iqdns3gu8f/age-sensors?orgId=1&refresh=auto', '_blank');
     };
 
     const temperatureMetrics = [
@@ -57,7 +81,7 @@ const Dashboard = () => {
     const chartData = [
         {
             title: 'Tendencia de Temperatura',
-            xAxisData: ['01:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+            xAxisData: timeData,
             series: [{ data: [2, 5.5, 2, 8.5, 1.5, 5] }],
         },
         {
@@ -66,7 +90,6 @@ const Dashboard = () => {
             series: [{ data: [62, 59, 55, 50, 45, 47, 53, 60] }],
         },
     ];
-
 
     return (
         <div className="dashboard-container">
@@ -84,7 +107,7 @@ const Dashboard = () => {
             {/* Sección de Gráficos */}
             <div className="charts-section">
                 {renderCharts(chartData)}
-            </div>         
+            </div>
         </div>
     );
 };

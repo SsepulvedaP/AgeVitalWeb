@@ -3,6 +3,7 @@ import pandas as pd
 import psycopg2
 import time
 from datetime import datetime
+import math
 
 # Extracción
 def connect_to_crate():
@@ -89,6 +90,10 @@ def load_data_to_postgres(df, conn):
         lat = row['lat']
         lon = row['lon']
 
+        if math.isnan(lat) or math.isnan(lon):
+            lat = 6.242308
+            lon = -75.589220
+
         cur.execute("SELECT id_sensor FROM Sensores WHERE nombre = %s", (nombre,))
         result = cur.fetchone()
         
@@ -121,8 +126,7 @@ def load_data_to_postgres(df, conn):
             avg_col = f'medida_promedio_{prefix}'
 
             if pd.notna(row[max_col]) and pd.notna(row[min_col]) and pd.notna(row[avg_col]):
-                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])
-                
+                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])              
                 try:
                     cur.execute("""
                         INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
@@ -132,6 +136,7 @@ def load_data_to_postgres(df, conn):
                 except psycopg2.errors.ForeignKeyViolation as e:
                     print(f"No se logró insertar mediciones para sensor {id_sensor} con nombre {nombre}. Error: {e}")
                     conn.rollback()
+
 
 def main():
     data = read_data()
