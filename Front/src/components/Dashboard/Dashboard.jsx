@@ -37,7 +37,7 @@ const renderCharts = (chartData) => (
 
 const Dashboard = () => {
     const openNewTab = () => {
-        window.open('http://10.38.32.137:3000/d/de15iqdns3gu8f/age-sensors?orgId=1&refresh=auto', '_blank');
+        window.open('http://localhost:3000/d/de15iqdns3gu8f/age-sensors?orgId=1&refresh=auto', '_blank');
     };
 
     const temperatureMetrics = [

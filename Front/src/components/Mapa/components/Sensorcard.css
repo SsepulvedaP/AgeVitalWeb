@@ -15,7 +15,6 @@
   }
   
   .status-badge {
-    background-color: #28a745; /* Color verde para "Activo" */
     color: white;
     padding: 5px 10px;
     border-radius: 12px;
@@ -24,6 +23,22 @@
     width: 40px;
     height: 10px;
   }
+
+  .status-badge.activo {
+    background-color: green;
+    color: white;
+}
+
+.status-badge.dañado {
+    background-color: purple;
+    color: white;
+}
+
+.status-badge.desactivado {
+    background-color: red;
+    color: white;
+}
+
   
   .sensor-title {
     color: #555;
