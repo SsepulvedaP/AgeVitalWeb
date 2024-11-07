@@ -1,3 +1,7 @@
+from flask_bcrypt import Bcrypt
+from auth import auth_bp
+from Back.config_db_users import Config  
+from flask_jwt_extended import JWTManager
 from flask import Flask,jsonify,request 
 from flask_cors import CORS, cross_origin
 from models import db
@@ -11,18 +15,9 @@ db.init_app(app)
 cors = CORS(app)
 
 with app.app_context():
-    db.create_all()  # Crea las tablas
+    db.create_all()
     
 app.register_blueprint(api, url_prefix='/api')
-
-@app.route('/trial', methods = ['GET']) 
-def ReturnJSON(): 
-    if(request.method == 'GET'): 
-        data = { 
-            "Sensor" : "Temperature", 
-            "Value" : 22.4, 
-        }
-        return jsonify(data) 
   
 if __name__=='__main__': 
     app.run(debug=True)

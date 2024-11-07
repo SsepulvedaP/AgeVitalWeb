@@ -93,20 +93,4 @@
     text-align: center;
 }
 
-.filters-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.filter-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
 
