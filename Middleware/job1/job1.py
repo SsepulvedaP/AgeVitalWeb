@@ -4,7 +4,7 @@ import psycopg2
 import time
 from datetime import datetime
 
-# Extraction
+# Extracción
 def connect_to_crate():
     try:
         return client.connect('http://localhost:4200', username='crate')
@@ -31,7 +31,7 @@ def read_data():
         cursor.close()
         connection.close()
 
-# Transformation
+# Transformación
 def clean_data(df):
     temp_valid = (df['temperatura'] >= 0) & (df['temperatura'] <= 50)
     humidity_valid = (df['humedadrelativa'] >= 0) & (df['humedadrelativa'] <= 100)
@@ -68,7 +68,6 @@ def clean_data(df):
 def load_data_to_postgres(df, conn):  
     cur = conn.cursor()
 
-    # Measurement types to check or create in TipoMedicion
     tipo_medicion_map = {
         'temperatura': 'temp',
         'humedadrelativa': 'hum',
@@ -76,7 +75,6 @@ def load_data_to_postgres(df, conn):
         'calidadaire': 'calidadaire'
     }
     
-    # Check for or insert types into TipoMedicion
     tipo_medicion_ids = {}
     for tipo, prefix in tipo_medicion_map.items():
         cur.execute("SELECT id_tipo_medicion FROM TipoMedicion WHERE nombre_tipo = %s", (tipo,))
@@ -92,13 +90,11 @@ def load_data_to_postgres(df, conn):
         
         tipo_medicion_ids[tipo] = tipo_id
 
-    # Insert sensor data and measurements
     for _, row in df.iterrows():
         nombre = row['entity_id']
         lat = row['lat']
         lon = row['lon']
 
-        # Check for or insert sensor
         cur.execute("SELECT id_sensor FROM Sensores WHERE nombre = %s", (nombre,))
         result = cur.fetchone()
         
@@ -114,7 +110,6 @@ def load_data_to_postgres(df, conn):
             id_sensor = result[0]
             print(f"Se encontró un sensor existente con el nombre: {nombre}")
 
-        # Insert into SensorMedicion if not exists
         for tipo, tipo_id in tipo_medicion_ids.items():
             cur.execute("""
                 SELECT 1 FROM SensorMedicion WHERE id_sensor = %s AND id_tipo_medicion = %s
@@ -126,7 +121,6 @@ def load_data_to_postgres(df, conn):
                 """, (id_sensor, tipo_id))
                 print(f"Relacion creada en SensorMedicion para sensor {id_sensor} y tipo de medicion {tipo_id}")
 
-        # Insert measurements
         for measure_type, prefix in tipo_medicion_map.items():
             max_col = f'medida_maxima_{prefix}'
             min_col = f'medida_minima_{prefix}'
