@@ -20,36 +20,40 @@ function Admin() {
     getSensorData()
       .then(data => {
         const temperatureSensors = data
-          .filter(sensor => sensor.tipo === 'temperatura')
+          .filter(sensor => sensor.tipo === 'TEMPERATURA')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(), 
             imagenurl: image
           }));
 
         const humiditySensors = data
-          .filter(sensor => sensor.tipo === 'humedadrelativa')
+          .filter(sensor => sensor.tipo === 'HUMEDAD')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
           }));
 
         const noiseSensors = data
-          .filter(sensor => sensor.tipo === 'ruido')
+          .filter(sensor => sensor.tipo === 'RUIDO')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
           }));
 
         const airQualitySensors = data
-        .filter(sensor => sensor.tipo === 'calidadaire')
+        .filter(sensor => sensor.tipo === 'CALIDAD_DEL_AIRE')
         .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
@@ -128,6 +132,7 @@ function Admin() {
           open={openModal} 
           handleClose={handleCloseModal} 
           nombreId={selectedSensor.nombreId}
+          id_sensor={selectedSensor.id_sensor}
           ubicacion={selectedSensor.ubicacion}
           estado={selectedSensor.estado}
           imagenurl={selectedSensor.imagenurl}

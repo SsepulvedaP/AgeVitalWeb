@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
 
 api = Blueprint('api', __name__)
@@ -75,3 +75,40 @@ def get_mediciones():
             'medida_promedio': medicion.medida_promedio
         })
     return jsonify(result)
+
+#nuevoooooooos
+@api.route('/sensores/<int:id_sensor>', methods=['PUT'])
+def update_sensor(id_sensor):
+    # Buscar el sensor por id_sensor
+    sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
+    
+    if not sensor:
+        return jsonify({"error": "Sensor no encontrado"}), 404
+
+    data = request.get_json()
+
+    # Actualizar los campos del sensor según los datos proporcionados en el JSON
+    if 'nombreId' in data:
+        sensor.nombre = data['nombreId']
+        
+    if 'longitud' in data:
+        sensor.longitud = data['longitud']
+        
+    if 'latitud' in data:
+        sensor.latitud = data['latitud']
+
+    if 'estado' in data:
+        sensor.estado = data['estado']
+
+    # Guardar los cambios en la base de datos
+    db.session.commit()
+
+    # Devolver la respuesta con el estado actualizado del sensor
+    return jsonify({
+        'id_sensor': sensor.id_sensor,  # Devolver id_sensor
+        'nombre': sensor.nombre,        # Devolver nombre actualizado
+        'longitud': sensor.longitud,
+        'latitud': sensor.latitud,
+        'estado': sensor.estado
+    }), 200
+
