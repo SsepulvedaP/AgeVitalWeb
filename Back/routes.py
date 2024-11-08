@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
+from crater_connection import update_sensor_entity_id
 
 api = Blueprint('api', __name__)
 
@@ -89,7 +90,9 @@ def update_sensor(id_sensor):
 
     # Actualizar los campos del sensor según los datos proporcionados en el JSON
     if 'nombreId' in data:
+        current_entity_id = sensor.nombre
         sensor.nombre = data['nombreId']
+        new_entity_id = data['nombreId']
         
     if 'longitud' in data:
         sensor.longitud = data['longitud']
@@ -102,13 +105,34 @@ def update_sensor(id_sensor):
 
     # Guardar los cambios en la base de datos
     db.session.commit()
+    
+    #if 'nombreId' in data and current_entity_id != new_entity_id:
+     #   try:
+      #      update_sensor_entity_id(current_entity_id, new_entity_id)
+        #except Exception as e:
+         #   return jsonify({"error": f"Error al actualizar entity_id en CrateDB: {str(e)}"}), 500
 
-    # Devolver la respuesta con el estado actualizado del sensor
     return jsonify({
-        'id_sensor': sensor.id_sensor,  # Devolver id_sensor
-        'nombre': sensor.nombre,        # Devolver nombre actualizado
+        'id_sensor': sensor.id_sensor,  
+        'nombre': sensor.nombre,        
         'longitud': sensor.longitud,
         'latitud': sensor.latitud,
         'estado': sensor.estado
     }), 200
 
+@api.route('/sensores/<int:id_sensor>', methods=['DELETE'])
+def delete_sensor(id_sensor):
+    # Buscar el sensor por id_sensor
+    sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
+    
+    if not sensor:
+        return jsonify({"error": "Sensor no encontrado"}), 404
+
+    # Eliminar todas las mediciones relacionadas antes de eliminar el sensor
+    db.session.query(Mediciones).filter_by(id_sensor=id_sensor).delete()
+    
+    # Eliminar el sensor de la base de datos
+    db.session.delete(sensor)
+    db.session.commit()
+
+    return jsonify({"message": f"Sensor con id {id_sensor} eliminado correctamente"}), 200
