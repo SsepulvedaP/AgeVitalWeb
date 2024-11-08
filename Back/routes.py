@@ -80,7 +80,6 @@ def get_mediciones():
 #nuevoooooooos
 @api.route('/sensores/<int:id_sensor>', methods=['PUT'])
 def update_sensor(id_sensor):
-    # Buscar el sensor por id_sensor
     sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
     
     if not sensor:
@@ -88,7 +87,6 @@ def update_sensor(id_sensor):
 
     data = request.get_json()
 
-    # Actualizar los campos del sensor según los datos proporcionados en el JSON
     if 'nombreId' in data:
         current_entity_id = sensor.nombre
         sensor.nombre = data['nombreId']
@@ -106,11 +104,11 @@ def update_sensor(id_sensor):
     # Guardar los cambios en la base de datos
     db.session.commit()
     
-    #if 'nombreId' in data and current_entity_id != new_entity_id:
-     #   try:
-      #      update_sensor_entity_id(current_entity_id, new_entity_id)
-        #except Exception as e:
-         #   return jsonify({"error": f"Error al actualizar entity_id en CrateDB: {str(e)}"}), 500
+    if 'nombreId' in data and current_entity_id != new_entity_id:
+        try:
+            update_sensor_entity_id(current_entity_id, new_entity_id)
+        except Exception as e:
+            return jsonify({"error": f"Error al actualizar entity_id en CrateDB: {str(e)}"}), 500
 
     return jsonify({
         'id_sensor': sensor.id_sensor,  
@@ -122,16 +120,13 @@ def update_sensor(id_sensor):
 
 @api.route('/sensores/<int:id_sensor>', methods=['DELETE'])
 def delete_sensor(id_sensor):
-    # Buscar el sensor por id_sensor
     sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
     
     if not sensor:
         return jsonify({"error": "Sensor no encontrado"}), 404
 
-    # Eliminar todas las mediciones relacionadas antes de eliminar el sensor
     db.session.query(Mediciones).filter_by(id_sensor=id_sensor).delete()
     
-    # Eliminar el sensor de la base de datos
     db.session.delete(sensor)
     db.session.commit()
 
