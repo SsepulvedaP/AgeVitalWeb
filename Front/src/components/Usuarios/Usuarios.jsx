@@ -1,51 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "./Usuarios.css";
+import { getUsers } from 'services/getUsers';
+import { registerUser } from 'services/registerUser';
 
 const Usuarios = () => {
-    const [usuarios, setUsuarios] = useState([
-        { id: 1, nombre: 'Admin', email: 'admin@example.com', rol: 'Admin' },
-        { id: 2, nombre: 'User1', email: 'user1@example.com', rol: 'Auxiliar' }
-    ]);
-
-    const [id, setId] = useState('');
-    const [nombre, setNombre] = useState('');
+    const [usuarios, setUsuarios] = useState([]);
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const [rol, setRol] = useState('Admin'); // Estado para el campo Rol
+    const [password, setPassword] = useState('');
+    const [role, setRole] = useState('Admin');
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
 
-    const handleAddUser = (e) => {
-        e.preventDefault();
-        if (usuarios.some(user => user.id === parseInt(id))) {
-            alert('El ID ya está en uso.');
-            return;
-        }
-        if (usuarios.some(user => user.email === email)) {
-            alert('El correo electrónico ya está en uso.');
-            return;
-        }
+    // Obtener los usuarios al montar el componente
+    useEffect(() => {
+        getUsers().then((data) => setUsuarios(data));
+    }, []);
 
-        const newUser = {
-            id: parseInt(id),
-            nombre,
-            email,
-            rol
-        };
-        setUsuarios([...usuarios, newUser]);
-        resetForm();
-    };
+    // Función para manejar el registro de un nuevo usuario
+    // Manejador de registro de usuario
+const handleAddUser = async (e) => {
+    e.preventDefault();
 
+    if (usuarios.some(user => user.email === email)) {
+        alert('El correo electrónico ya está en uso.');
+        return;
+    }
+
+    console.log("Datos enviados para registro:", username, email, password, role);
+
+    try {
+        const newUser = await registerUser(username, email, password, role);
+        console.log("Respuesta del servidor:", newUser);
+
+        // Asegúrate de que newUser contiene los datos esperados
+        if (newUser && newUser.id) {
+            setUsuarios([...usuarios, { id: newUser.id, username: newUser.username, email: newUser.email, role: newUser.role }]);
+            resetForm();
+        } else {
+            console.error("Error: Los datos de newUser son inválidos:", newUser);
+        }
+    } catch (error) {
+        console.error("Error al registrar usuario:", error);
+    }
+};
+
+
+    // Función para cargar los datos en el formulario al editar un usuario
     const handleEditUser = (user) => {
         setIsEditing(true);
         setEditId(user.id);
-        setId(user.id);
-        setNombre(user.nombre);
+        setUsername(user.username);
         setEmail(user.email);
-        setRol(user.rol);
+        setRole(user.role);
+        setPassword(''); // Se puede dejar vacío para que el usuario lo actualice si es necesario
     };
 
+    // Función para manejar la actualización de un usuario
     const handleUpdateUser = (e) => {
         e.preventDefault();
+
         if (usuarios.some(user => user.email === email && user.id !== editId)) {
             alert('El correo electrónico ya está en uso.');
             return;
@@ -53,21 +67,23 @@ const Usuarios = () => {
 
         setUsuarios(
             usuarios.map((user) =>
-                user.id === editId ? { ...user, nombre, email, rol } : user
+                user.id === editId ? { ...user, username, email, role } : user
             )
         );
         resetForm();
     };
 
+    // Función para manejar la eliminación de un usuario
     const handleDeleteUser = (id) => {
         setUsuarios(usuarios.filter((user) => user.id !== id));
     };
 
+    // Función para limpiar el formulario
     const resetForm = () => {
-        setId('');
-        setNombre('');
+        setUsername('');
         setEmail('');
-        setRol('Admin'); // Resetear el rol al valor por defecto
+        setRole('Admin');
+        setPassword('');
         setIsEditing(false);
         setEditId(null);
     };
@@ -81,16 +97,9 @@ const Usuarios = () => {
                 <form onSubmit={isEditing ? handleUpdateUser : handleAddUser}>
                     <input
                         type="text"
-                        placeholder="ID"
-                        value={id}
-                        onChange={(e) => setId(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="Nombre"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
                     <input
@@ -100,13 +109,20 @@ const Usuarios = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
+                    <input
+                        type="password"
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
                     <select
-                        value={rol}
-                        onChange={(e) => setRol(e.target.value)}
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
                         required
                     >
-                        <option value="Admin">Admin</option>
-                        <option value="Auxiliar">Auxiliar</option>
+                        <option value="Admin">admin</option>
+                        <option value="Auxiliar">user</option>
                     </select>
                     <button type="submit">{isEditing ? 'Actualizar' : 'Agregar'}</button>
                 </form>
@@ -117,7 +133,7 @@ const Usuarios = () => {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Nombre</th>
+                        <th>Username</th>
                         <th>Email</th>
                         <th>Rol</th>
                         <th>Acciones</th>
@@ -127,9 +143,9 @@ const Usuarios = () => {
                     {usuarios.map((user) => (
                         <tr key={user.id}>
                             <td>{user.id}</td>
-                            <td>{user.nombre}</td>
+                            <td>{user.username}</td>
                             <td>{user.email}</td>
-                            <td>{user.rol}</td>
+                            <td>{user.role}</td>
                             <td>
                                 <div className="button-container">
                                     <button className="button edit" onClick={() => handleEditUser(user)}>Editar</button>
