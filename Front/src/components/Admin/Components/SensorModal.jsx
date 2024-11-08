@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import styles from './SensorModal.module.css';
 import { NavLink } from 'react-router-dom';
 import { updateSensor } from 'services/getSensorData'; 
+import { deleteSensor } from 'services/getSensorData';
 
 const SensorModal = ({ open, handleClose, nombreId, id_sensor, ubicacion, estado, imagenurl, handleUpdate,handleDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -17,14 +18,12 @@ const SensorModal = ({ open, handleClose, nombreId, id_sensor, ubicacion, estado
       return;
     }
     try {
-      console.log(id_sensor)
       const cleanedUbicacion = editedUbicacion.replace(/[()]/g, ''); 
       const [latitud, longitud] = cleanedUbicacion.split(',').map(Number); 
       if (isNaN(latitud) || isNaN(longitud)) {
         alert('Ubicación inválida. Asegúrate de que esté en el formato correcto (latitud,longitud)');
         return;
       }
-      console.log("Nombre a actualizar:", editedNombre);  // Verificar que editedNombre tenga el valor que esperas
       const updatedSensor = await updateSensor(editedNombre,id_sensor, latitud, longitud, editedEstado, imagenurl);
       handleUpdate(updatedSensor);  
       handleClose();
@@ -41,11 +40,18 @@ const SensorModal = ({ open, handleClose, nombreId, id_sensor, ubicacion, estado
     setEditedEstado(estado);
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
     if (estado === 'activo') {
       alert('No se puede eliminar un sensor activo');
     } else {
-      handleDelete(nombreId); 
+      try {
+        await deleteSensor(id_sensor); // Llama a la API para eliminar el sensor
+        handleDelete(id_sensor); // Llama a handleDelete con id_sensor
+        handleClose(); // Cierra el modal
+      } catch (error) {
+        console.error("Error al eliminar el sensor:", error);
+        alert("Hubo un error al intentar eliminar el sensor.");
+      }
     }
   };
 

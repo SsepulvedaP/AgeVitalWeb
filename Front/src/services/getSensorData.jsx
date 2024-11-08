@@ -39,3 +39,20 @@ export const updateSensor = async (nombreId,id_sensor, latitud, longitud, estado
     throw error;
   }
 };
+
+export const deleteSensor = async (id_sensor) => {
+  try {
+    const response = await fetch(`http://localhost:5000/api/sensores/${id_sensor}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al eliminar el sensor');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error al eliminar el sensor:", error);
+    throw error;
+  }
+};
