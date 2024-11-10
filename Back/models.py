@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
 db = SQLAlchemy()
 bcrypt = Bcrypt()
+
 class Sensores(db.Model):
     __tablename__ = 'sensores'
     
@@ -41,13 +43,11 @@ class Mediciones(db.Model):
     tipo_medicion = db.relationship('TipoMedicion', backref='mediciones_diarias')
     
 
-# Modelo de Rol
 class Role(db.Model):
     __tablename__ = 'roles'
     role_name = db.Column(db.String(20), primary_key=True)
     description = db.Column(db.String(100))
 
-# Modelo de Usuario
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
