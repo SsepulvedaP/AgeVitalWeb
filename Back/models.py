@@ -9,7 +9,8 @@ class Sensores(db.Model):
     id_sensor = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
     estado = db.Column(db.String(100))
-    ubicacion = db.Column(db.String(100))
+    latitud = db.Column(db.Float)
+    longitud = db.Column(db.Float) 
     fecha_instalacion = db.Column(db.Date)
     
 class TipoMedicion(db.Model):

@@ -1,7 +1,16 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+Front/node_modules/
+Front/.vscode/
+Back/__pycache__/
+Back/venv/
+
+# testing
+app.py
+sensor_coords.json
+
+.venv
 /.pnp
 .pnp.js
 
