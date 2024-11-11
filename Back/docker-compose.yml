@@ -1,12 +1,13 @@
-version: "3.8"
+version: '3.8'
 services:
   web:
     build: .
     ports:
       - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db:5432/usuarios_db
+      - SQLALCHEMY_SENSORES_DATABASE_URI=postgresql://upb123:upb123@db_sensores:5432/sensores_db
     env_file: .env
-    networks:
-      - back
     depends_on:
       - db_usuarios
       - db_sensores
@@ -18,9 +19,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: usuarios_db
     ports:
-      - "5435:5432" # Esto mapea el puerto 5432 del contenedor al puerto 5435 de tu máquina
+      - "5435:5432" 
     volumes:
-      - usuarios_data:/var/lib/postgresql/data # Volume for persistent storage
+      - usuarios_data:/var/lib/postgresql/data
     networks:
       - back
 
@@ -33,7 +34,7 @@ services:
     ports:
       - "5436:5432"
     volumes:
-      - sensores_data:/var/lib/postgresql/data # Volume for persistent storage
+      - sensores_data:/var/lib/postgresql/data
     networks:
       - back
 

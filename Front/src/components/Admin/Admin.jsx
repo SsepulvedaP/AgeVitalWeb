@@ -23,6 +23,7 @@ function Admin() {
           .filter(sensor => sensor.tipo === 'temperatura')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(), 
             imagenurl: image
@@ -32,6 +33,7 @@ function Admin() {
           .filter(sensor => sensor.tipo === 'humedadrelativa')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion:  `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
@@ -41,15 +43,17 @@ function Admin() {
           .filter(sensor => sensor.tipo === 'ruido')
           .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
           }));
 
         const airQualitySensors = data
-        .filter(sensor => sensor.tipo === 'calidadaire')
+        .filter(sensor => sensor.tipo === 'calidaddelaire')
         .map(sensor => ({
             nombreId: sensor.nombre,
+            id_sensor: sensor.id_sensor,
             ubicacion: `(${sensor.latitud}, ${sensor.longitud})`,
             estado: sensor.estado.toLowerCase(),
             imagenurl: image
@@ -128,6 +132,7 @@ function Admin() {
           open={openModal} 
           handleClose={handleCloseModal} 
           nombreId={selectedSensor.nombreId}
+          id_sensor={selectedSensor.id_sensor}
           ubicacion={selectedSensor.ubicacion}
           estado={selectedSensor.estado}
           imagenurl={selectedSensor.imagenurl}
