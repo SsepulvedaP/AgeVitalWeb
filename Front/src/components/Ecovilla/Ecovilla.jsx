@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Box, Button, SwipeableDrawer, Typography } from "@mui/material";
+import { SwipeableDrawer, Typography } from "@mui/material";
 
 //Styles
 import styles from "./Ecovilla.module.css";
+import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
 
 const Ecovilla = () => {
   const [pisoActual, setPisoActual] = useState("Primer Piso");
@@ -13,16 +14,16 @@ const Ecovilla = () => {
   };
 
   return (
-    <section>
+    <section className={styles.Section}>
+        <button onClick={toggleDrawer(true)} className={styles.toggleDrawer}>
+            <InsertChartOutlinedRoundedIcon/>
+        </button>
       <img
         src="https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg"
         className={styles.Background}
       />
       <div className={styles.Wrapper}>
         <h1>{pisoActual}</h1>
-        <Box sx={{ textAlign: "center", pt: 1 }}>
-        <Button onClick={toggleDrawer(true)}>Open</Button>
-      </Box>
       <SwipeableDrawer
         anchor="right"
         open={open}
@@ -33,23 +34,12 @@ const Ecovilla = () => {
           keepMounted: true,
         }}
       >
-        <Typography
-          sx={{
-            p: 2,
-            color: "text.secondary",
-          }}
-        >
-          51 results
-        </Typography>
-        <Typography sx={{ p: 2, color: "text.secondary" }}>
-          51 results
-        </Typography>
-        <Typography sx={{ p: 2, color: "text.secondary" }}>
-          51 results
-        </Typography>
-        <Typography sx={{ p: 2, color: "text.secondary" }}>
-          51 results
-        </Typography>
+        <button onClick={() => setPisoActual("Primer Piso")}>
+            <Typography>Primer Piso</Typography>
+        </button>
+        <button onClick={() => setPisoActual("Segundo Piso")}>
+            <Typography>Segundo Piso</Typography>
+        </button>
       </SwipeableDrawer>
       </div>
     </section>
