@@ -1,43 +1,59 @@
-import React, { useState } from 'react';
-import './Ecovilla.css';
+import React, { useState } from "react";
+import { Box, Button, SwipeableDrawer, Typography } from "@mui/material";
 
-const planosData = {
-    primerPiso: [
-        { id: 1, top: '90px', left: '40px' }, // Sensor en la división
-        { id: 2, top: '150px', left: '140px' }, // Sensor en la habitación
-    ],
-    segundoPiso: [
-        { id: 3, top: '70px', left: '150px' },
-        { id: 4, top: '200px', left: '250px' },
-    ],
-};
-
-const Piso = ({ piso, sensores }) => {
-    return (
-        <div className={`piso ${piso}`}>
-            <h2>{piso === 'primerPiso' ? 'Primer Piso' : 'Segundo Piso'}</h2>
-            {sensores.map(sensor => (
-                <div
-                    key={sensor.id}
-                    className="sensor"
-                    style={{ top: sensor.top, left: sensor.left }}
-                />
-            ))}
-        </div>
-    );
-};
+//Styles
+import styles from "./Ecovilla.module.css";
 
 const Ecovilla = () => {
-    const [pisoActual, setPisoActual] = useState('primerPiso');
+  const [pisoActual, setPisoActual] = useState("Primer Piso");
+  const [open, setOpen] = React.useState(false);
 
-    return (
-        <div className="container">
-            <h1 >Boceto de Planos</h1>
-            <button onClick={() => setPisoActual('primerPiso')}>Primer Piso</button>
-            <button onClick={() => setPisoActual('segundoPiso')}>Segundo Piso</button>
-            <Piso piso={pisoActual} sensores={planosData[pisoActual]} />
-        </div>
-    );
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+  };
+
+  return (
+    <section>
+      <img
+        src="https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg"
+        className={styles.Background}
+      />
+      <div className={styles.Wrapper}>
+        <h1>{pisoActual}</h1>
+        <Box sx={{ textAlign: "center", pt: 1 }}>
+        <Button onClick={toggleDrawer(true)}>Open</Button>
+      </Box>
+      <SwipeableDrawer
+        anchor="right"
+        open={open}
+        onClose={toggleDrawer(false)}
+        onOpen={toggleDrawer(true)}
+        disableSwipeToOpen={false}
+        ModalProps={{
+          keepMounted: true,
+        }}
+      >
+        <Typography
+          sx={{
+            p: 2,
+            color: "text.secondary",
+          }}
+        >
+          51 results
+        </Typography>
+        <Typography sx={{ p: 2, color: "text.secondary" }}>
+          51 results
+        </Typography>
+        <Typography sx={{ p: 2, color: "text.secondary" }}>
+          51 results
+        </Typography>
+        <Typography sx={{ p: 2, color: "text.secondary" }}>
+          51 results
+        </Typography>
+      </SwipeableDrawer>
+      </div>
+    </section>
+  );
 };
 
 export default Ecovilla;
