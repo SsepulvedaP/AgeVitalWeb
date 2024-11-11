@@ -38,7 +38,6 @@ class User(db.Model):
 
 
 #sensores
-
 class Sensores(db.Model):
     __bind_key__ = 'sensores_db'
     __tablename__ = 'sensores'
@@ -81,4 +80,4 @@ class Mediciones(db.Model):
     medida_promedio = db.Column(db.Numeric(10, 2), nullable=False)
 
     sensor = db.relationship('Sensores', backref='mediciones_diarias')
-    tipo_medicion = db.relationship('TipoMedicion', backref='mediciones_diarias')
+    tipo_medicion = db.relationship('TipoMedicion', backref='mediciones_diarias')    

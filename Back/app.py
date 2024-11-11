@@ -6,18 +6,19 @@ from config import Config
 from models import db
 from auth import auth_bp  # Importa el blueprint de autenticación
 from routes import api 
-import os
+import os 
 
 app = Flask(__name__)
+app.config.from_object(Config)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+db.init_app(app)
+bcrypt = Bcrypt(app)  
+jwt = JWTManager(app)  
 cors = CORS(app)
 app.config.from_object(Config)
-
 app.config['CORS_HEADERS'] = 'content-type'
-db.init_app(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
 
-# Crear las tablas en la base de datos si no existen
 with app.app_context():
     db.create_all()
 

@@ -3,11 +3,12 @@ import pandas as pd
 import psycopg2
 import time
 from datetime import datetime
+import math
 
-# Extraction
+# Extracción
 def connect_to_crate():
     try:
-        return client.connect('http://localhost:4200', username='crate')
+        return client.connect('http://10.38.32.137:4200', username='crate')
     except Exception as e:
         print(f"Error al conectar a CrateDB: {e}")
         return None
@@ -20,9 +21,9 @@ def read_data():
     cursor = connection.cursor()
     try:
         query = """
-        SELECT entity_id, temperatura, humedadrelativa, ruido, calidadaire, time_index, lat, lon
+        SELECT entity_id, temperatura, humedadrelativa, ruido, time_index, lat, lon
         FROM "doc"."etvariables"
-        WHERE time_index >= ?
+        WHERE time_index < ?
         """
         cursor.execute(query, (time.time() - 86400,))
         rows = cursor.fetchall()
@@ -31,17 +32,15 @@ def read_data():
         cursor.close()
         connection.close()
 
-# Transformation
+# Transformación
 def clean_data(df):
     temp_valid = (df['temperatura'] >= 0) & (df['temperatura'] <= 50)
     humidity_valid = (df['humedadrelativa'] >= 0) & (df['humedadrelativa'] <= 100)
     noise_valid = (df['ruido'] >= 0) & (df['ruido'] <= 130)
-    air_quality_valid = (df['calidadaire'] >= 0) & (df['calidadaire'] <= 500)
     
     df.loc[~temp_valid, 'temperatura'] = pd.NA
     df.loc[~humidity_valid, 'humedadrelativa'] = pd.NA
     df.loc[~noise_valid, 'ruido'] = pd.NA
-    df.loc[~air_quality_valid, 'calidadaire'] = pd.NA
     
     grouped = df.groupby('entity_id').agg(
         medida_maxima_temp=pd.NamedAgg(column='temperatura', aggfunc='max'),
@@ -53,9 +52,6 @@ def clean_data(df):
         medida_maxima_ruido=pd.NamedAgg(column='ruido', aggfunc='max'),
         medida_minima_ruido=pd.NamedAgg(column='ruido', aggfunc='min'),
         medida_promedio_ruido=pd.NamedAgg(column='ruido', aggfunc='mean'),
-        medida_maxima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='max'),
-        medida_minima_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='min'),
-        medida_promedio_calidadaire=pd.NamedAgg(column='calidadaire', aggfunc='mean'),
         lat = pd.NamedAgg(column='lat', aggfunc='first'),
         lon = pd.NamedAgg(column='lon', aggfunc='first')
     ).reset_index()
@@ -68,15 +64,12 @@ def clean_data(df):
 def load_data_to_postgres(df, conn):  
     cur = conn.cursor()
 
-    # Measurement types to check or create in TipoMedicion
     tipo_medicion_map = {
         'temperatura': 'temp',
         'humedadrelativa': 'hum',
         'ruido': 'ruido',
-        'calidadaire': 'calidadaire'
     }
     
-    # Check for or insert types into TipoMedicion
     tipo_medicion_ids = {}
     for tipo, prefix in tipo_medicion_map.items():
         cur.execute("SELECT id_tipo_medicion FROM TipoMedicion WHERE nombre_tipo = %s", (tipo,))
@@ -92,13 +85,15 @@ def load_data_to_postgres(df, conn):
         
         tipo_medicion_ids[tipo] = tipo_id
 
-    # Insert sensor data and measurements
     for _, row in df.iterrows():
         nombre = row['entity_id']
         lat = row['lat']
         lon = row['lon']
 
-        # Check for or insert sensor
+        if math.isnan(lat) or math.isnan(lon):
+            lat = 6.242308
+            lon = -75.589220
+
         cur.execute("SELECT id_sensor FROM Sensores WHERE nombre = %s", (nombre,))
         result = cur.fetchone()
         
@@ -114,7 +109,6 @@ def load_data_to_postgres(df, conn):
             id_sensor = result[0]
             print(f"Se encontró un sensor existente con el nombre: {nombre}")
 
-        # Insert into SensorMedicion if not exists
         for tipo, tipo_id in tipo_medicion_ids.items():
             cur.execute("""
                 SELECT 1 FROM SensorMedicion WHERE id_sensor = %s AND id_tipo_medicion = %s
@@ -126,15 +120,13 @@ def load_data_to_postgres(df, conn):
                 """, (id_sensor, tipo_id))
                 print(f"Relacion creada en SensorMedicion para sensor {id_sensor} y tipo de medicion {tipo_id}")
 
-        # Insert measurements
         for measure_type, prefix in tipo_medicion_map.items():
             max_col = f'medida_maxima_{prefix}'
             min_col = f'medida_minima_{prefix}'
             avg_col = f'medida_promedio_{prefix}'
 
             if pd.notna(row[max_col]) and pd.notna(row[min_col]) and pd.notna(row[avg_col]):
-                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])
-                
+                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])              
                 try:
                     cur.execute("""
                         INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
@@ -145,20 +137,21 @@ def load_data_to_postgres(df, conn):
                     print(f"No se logró insertar mediciones para sensor {id_sensor} con nombre {nombre}. Error: {e}")
                     conn.rollback()
 
+
 def main():
     data = read_data()
     if data is None:
         print("No hay datos en crate.")
         return
     
-    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'calidadaire', 'time_index', 'lat', 'lon'])
+    df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
     
-    conn = psycopg2.connect(database="datos_agesensors",
-                            user="postgres",
+    conn = psycopg2.connect(database="sensores_db",
+                            user="upb123",
                             password="upb123",
-                            host="127.0.0.1",
-                            port="5432")
+                            host="10.38.32.137",
+                            port="5436")
 
     load_data_to_postgres(df, conn)
 

@@ -2,8 +2,37 @@ import requests
 from flask import Blueprint, jsonify, request
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
 from crater_connection import update_sensor_entity_id, delete_sensor_by_entity_id
+from datetime import datetime, timedelta
 
 api = Blueprint('api', __name__)
+
+@api.route('/globalmetrics', methods=['GET'])
+def get_global_metrics():
+    now = datetime.now()
+    last_24_hours = now - timedelta(hours=24)
+
+    tipos_medicion = db.session.query(TipoMedicion).all()
+    result = []
+
+    for tipo in tipos_medicion:
+        metrics = db.session.query(
+            db.func.min(Mediciones.medida_minima).label('minima'),
+            db.func.max(Mediciones.medida_maxima).label('maxima'),
+            db.func.avg(Mediciones.medida_promedio).label('promedio')
+        ).filter(
+            Mediciones.id_tipo_medicion == tipo.id_tipo_medicion,
+            Mediciones.fecha >= last_24_hours
+        ).first()
+
+        result.append({
+            'tipo_medicion': tipo.nombre_tipo,
+            'minima': metrics.minima,
+            'maxima': metrics.maxima,
+            'promedio': metrics.promedio
+        })
+
+    return jsonify(result)
+
 
 @api.route('/sensores', methods=['GET'])
 def get_sensores():
@@ -133,12 +162,6 @@ def update_sensor(id_sensor):
         sensor.estado = data['estado']
 
     db.session.commit()
-    
-    if 'nombreId' in data and current_entity_id != new_entity_id:
-        try:
-            update_sensor_entity_id(current_entity_id, new_entity_id)
-        except Exception as e:
-            return jsonify({"error": f"Error al actualizar entity_id en CrateDB: {str(e)}"}), 500
 
     return jsonify({
         'id_sensor': sensor.id_sensor,  
@@ -158,6 +181,13 @@ def delete_sensor(id_sensor):
     db.session.query(Mediciones).filter_by(id_sensor=id_sensor).delete()
     
     db.session.delete(sensor)
+    current_entity_id =sensor.nombre
+    url_delete = f'http://10.38.32.137:1026/v2/entities/{current_entity_id}'
+    response_delete = requests.delete(url_delete)
+    
+    if response_delete.status_code != 204:
+        return jsonify({"error": "No se pudo eliminar la entidad anterior en Orion"}), response_delete.status_code
+    
     db.session.commit()
     
     try:
