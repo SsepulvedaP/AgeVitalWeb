@@ -58,8 +58,6 @@
     }
 }
 
-.Map {
-    width: 80%;
-    height: 80%;
-    object-fit: contain;
+.Graph :global .mpld3-baseaxes{
+    width: 50vw;
 }

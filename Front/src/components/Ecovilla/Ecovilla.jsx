@@ -45,7 +45,7 @@ const Ecovilla = () => {
           )}
           )}
         </script>
-        <div id={fig_name}></div>
+        <div className={styles.Graph} id={fig_name}></div>
         <SwipeableDrawer
           anchor="right"
           open={open}
