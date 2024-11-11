@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { SwipeableDrawer, Typography } from "@mui/material";
 
+//Components
+import { mpld3_load_lib } from "./components/mpld3_load_lib";
+import mpld3 from "mpld3";
+import json from "assets/output_1.json";
+
 //Styles
 import styles from "./Ecovilla.module.css";
 import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
@@ -10,14 +15,13 @@ import SegundaPlanta from "assets/SegundaPlanta.png";
 const Ecovilla = () => {
   const [pisoActual, setPisoActual] = useState("Primer Piso");
   const ImagenPlanta =
-    pisoActual === "Primer Piso"
-      ? PrimerPlanta
-      : SegundaPlanta;
+    pisoActual === "Primer Piso" ? PrimerPlanta : SegundaPlanta;
   const [open, setOpen] = React.useState(false);
-
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
+  const fig_name = "fig_el427345810798888193429725";
 
   return (
     <section className={styles.Section}>
@@ -30,7 +34,18 @@ const Ecovilla = () => {
       />
       <div className={styles.Wrapper}>
         <h1>{pisoActual}</h1>
-        <img src={ImagenPlanta} alt="" className={styles.Map} />
+        <script>
+          mpld3_load_lib("https://d3js.org/d3.v5.js", function (){" "}
+          {mpld3_load_lib(
+            "https://mpld3.github.io/js/mpld3.v0.5.8.js",
+            function () {
+              mpld3.remove_figure(fig_name);
+              mpld3.draw_figure(fig_name, json);
+            }
+          )}
+          );
+        </script>
+        <div id={fig_name}></div>
         <SwipeableDrawer
           anchor="right"
           open={open}
