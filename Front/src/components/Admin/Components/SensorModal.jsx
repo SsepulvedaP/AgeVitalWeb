@@ -45,9 +45,9 @@ const SensorModal = ({ open, handleClose, nombreId, id_sensor, ubicacion, estado
       alert('No se puede eliminar un sensor activo');
     } else {
       try {
-        await deleteSensor(id_sensor); // Llama a la API para eliminar el sensor
-        handleDelete(id_sensor); // Llama a handleDelete con id_sensor
-        handleClose(); // Cierra el modal
+        await deleteSensor(id_sensor);
+        handleDelete(id_sensor); 
+        handleClose(); 
       } catch (error) {
         console.error("Error al eliminar el sensor:", error);
         alert("Hubo un error al intentar eliminar el sensor.");

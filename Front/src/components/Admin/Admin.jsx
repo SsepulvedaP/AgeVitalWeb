@@ -20,7 +20,7 @@ function Admin() {
     getSensorData()
       .then(data => {
         const temperatureSensors = data
-          .filter(sensor => sensor.tipo === 'TEMPERATURA')
+          .filter(sensor => sensor.tipo === 'temperatura')
           .map(sensor => ({
             nombreId: sensor.nombre,
             id_sensor: sensor.id_sensor,
@@ -30,7 +30,7 @@ function Admin() {
           }));
 
         const humiditySensors = data
-          .filter(sensor => sensor.tipo === 'HUMEDAD')
+          .filter(sensor => sensor.tipo === 'humedadrelativa')
           .map(sensor => ({
             nombreId: sensor.nombre,
             id_sensor: sensor.id_sensor,
@@ -40,7 +40,7 @@ function Admin() {
           }));
 
         const noiseSensors = data
-          .filter(sensor => sensor.tipo === 'RUIDO')
+          .filter(sensor => sensor.tipo === 'ruido')
           .map(sensor => ({
             nombreId: sensor.nombre,
             id_sensor: sensor.id_sensor,
@@ -50,7 +50,7 @@ function Admin() {
           }));
 
         const airQualitySensors = data
-        .filter(sensor => sensor.tipo === 'CALIDAD_DEL_AIRE')
+        .filter(sensor => sensor.tipo === 'calidaddelaire')
         .map(sensor => ({
             nombreId: sensor.nombre,
             id_sensor: sensor.id_sensor,

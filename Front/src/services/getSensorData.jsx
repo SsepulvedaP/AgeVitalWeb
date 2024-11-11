@@ -1,6 +1,6 @@
 export const getSensorData = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/sensores');
+      const response = await fetch('http://10.38.32.137:5000/api/sensores');
       if (!response.ok) {
         throw new Error(`Error al obtener los datos: ${response.statusText}`);
       }
@@ -15,7 +15,7 @@ export const getSensorData = async () => {
 // Función para actualizar un sensor
 export const updateSensor = async (nombreId,id_sensor, latitud, longitud, estado, imagenurl) => {
   try {
-    const response = await fetch(`http://localhost:5000/api/sensores/${id_sensor}`, {
+    const response = await fetch(`http://10.38.32.137:5000/api/sensores/${id_sensor}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -42,17 +42,26 @@ export const updateSensor = async (nombreId,id_sensor, latitud, longitud, estado
 
 export const deleteSensor = async (id_sensor) => {
   try {
-    const response = await fetch(`http://localhost:5000/api/sensores/${id_sensor}`, {
+    const response = await fetch(`http://10.38.32.137:5000/api/sensores/${id_sensor}`, {
       method: 'DELETE',
     });
 
     if (!response.ok) {
+      console.error('Response failed:', response);
       throw new Error('Error al eliminar el sensor');
     }
 
-    return await response.json();
+    if (response.status === 204) {
+      console.log('Sensor eliminado correctamente');
+      return;
+    }
+
+    const data = await response.json();
+    console.log('Respuesta de eliminación:', data);
+    return data;
   } catch (error) {
     console.error("Error al eliminar el sensor:", error);
     throw error;
   }
 };
+
