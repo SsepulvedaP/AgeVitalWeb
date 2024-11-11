@@ -34,8 +34,8 @@ const Ecovilla = () => {
       />
       <div className={styles.Wrapper}>
         <h1>{pisoActual}</h1>
-        <script>
-          mpld3_load_lib("https://d3js.org/d3.v5.js", function (){" "}
+        <script type="module">
+          {mpld3_load_lib("https://d3js.org/d3.v5.js", function ()
           {mpld3_load_lib(
             "https://mpld3.github.io/js/mpld3.v0.5.8.js",
             function () {
@@ -43,7 +43,7 @@ const Ecovilla = () => {
               mpld3.draw_figure(fig_name, json);
             }
           )}
-          );
+          )}
         </script>
         <div id={fig_name}></div>
         <SwipeableDrawer
