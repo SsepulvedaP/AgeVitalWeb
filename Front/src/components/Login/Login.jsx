@@ -4,6 +4,7 @@ import { loginUser } from 'services/loginUser';  // Asegúrate de que la ruta se
 import "./Login.css";
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
 import { jwtDecode } from "jwt-decode";
+import Swal from 'sweetalert2';  // Importar SweetAlert2
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -25,14 +26,15 @@ function Login() {
       // Guardar el rol en localStorage
       localStorage.setItem("user_role", role);
 
-    console.log("--------------------------------------");
-      console.log("TOKENNNNNNNNNN:", token);
-      console.log("Rol del usuario:", role);
-
       navigate("/");
       window.location.reload();
     } else {
-      alert("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+      // Mostrar alerta si las credenciales son incorrectas
+      Swal.fire({
+        icon: 'error',
+        title: 'Credenciales Incorrectas',
+        text: 'Por favor, inténtalo de nuevo.',
+      });
     }
   };
 

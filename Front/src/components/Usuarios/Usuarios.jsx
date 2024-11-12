@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import "./Usuarios.css";
 import { getUsers } from 'services/getUsers';
 import { registerUser } from 'services/registerUser';
@@ -49,14 +49,14 @@ const Usuarios = () => {
         }
     };
 
-    const handleEditUser = (user) => {
+    /*const handleEditUser = (user) => {
         setIsEditing(true);
         setEditId(user.id);
         setUsername(user.username);
         setEmail(user.email);
         setRole(user.role);
         setPassword('');
-    };
+    };*/
 
     const handleChangePassword = async (userId) => {
         setIsChangingPassword(true);
