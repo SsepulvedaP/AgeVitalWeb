@@ -19,7 +19,7 @@ export const loginUser = async (email, password) => {
       
       // Asegúrate de que el token venga correctamente
       if (data.access_token) {
-          return data.access_token;  // Asumiendo que el token viene en la propiedad 'token'
+          return data.access_token;  
       } else {
           throw new Error("Token no recibido.");
       }

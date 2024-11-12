@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from 'services/loginUser';  // Asegúrate de que la ruta sea correcta
 import "./Login.css";
 import ExitToAppRoundedIcon from '@mui/icons-material/ExitToAppRounded';
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,21 +12,28 @@ function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Llamamos al servicio loginUser con los datos del formulario
+  
     const token = await loginUser(email, password);
     if (token) {
-      // Guardamos el token en el localStorage o en cualquier lugar adecuado
-      localStorage.setItem('access_token', token);
-      console.log(localStorage.getItem('access_token'));
+      // Guardar el token en localStorage
+      localStorage.setItem("access_token", token);
+  
+      // Decodificar el token para obtener el rol
+      const decodedToken = jwtDecode(token);
+      const role = decodedToken.role;  // Accede al rol en los claims adicionales
+  
+      // Guardar el rol en localStorage
+      localStorage.setItem("user_role", role);
 
-      // Redirigimos al usuario a la página principal o alguna otra
-      navigate("/"); // Puedes cambiar esto a la ruta que desees
+    console.log("--------------------------------------");
+      console.log("TOKENNNNNNNNNN:", token);
+      console.log("Rol del usuario:", role);
+
+      navigate("/");
+      window.location.reload();
     } else {
-      // Maneja error de login (por ejemplo, mostrando un mensaje)
       alert("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
     }
-    window.location.reload();
   };
 
   return (
