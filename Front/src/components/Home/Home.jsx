@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Home.css';
 import homeImage from './home1.png';
 import homeImage2 from './image2.png';
@@ -7,7 +7,17 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import AccessTimeFilledRoundedIcon from '@mui/icons-material/AccessTimeFilledRounded';
 
+
 const Home = () => {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Verifica si el token está en localStorage
+    const token = localStorage.getItem('access_token');
+    setIsAuthenticated(token !== null); // Establece si el usuario está logueado
+  }, []);
+
   return (
     <div className="home-container">
       {/* Sección 1 */}
@@ -15,9 +25,12 @@ const Home = () => {
         <div className="section1-content">
           <h1 className="title">Monitoreo Inteligente para un<br /> Envejecimiento Saludable</h1>
           <p className="description">AgeVital+ utiliza tecnología IoT para monitorear<br /> tu salud física y mental en tiempo real.</p>
-          <NavLink to="/login">
-            <button className="enter-button">Ingresar</button>
-          </NavLink>
+          {/* Solo muestra el botón "Ingresar" si el usuario no está logueado */}
+          {!isAuthenticated && (
+            <NavLink to="/login">
+              <button className="enter-button">Ingresar</button>
+            </NavLink>
+          )}
         </div>
         <img src={homeImage} alt="Imagen principal" className="section1-image" />
       </section>

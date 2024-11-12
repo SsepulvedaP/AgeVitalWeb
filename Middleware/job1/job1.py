@@ -8,7 +8,7 @@ import math
 # Extracción
 def connect_to_crate():
     try:
-        return client.connect('http://10.38.32.137:4200', username='crate')
+        return client.connect('http://localhost:4200', username='crate')
     except Exception as e:
         print(f"Error al conectar a CrateDB: {e}")
         return None
@@ -23,7 +23,7 @@ def read_data():
         query = """
         SELECT entity_id, temperatura, humedadrelativa, ruido, time_index, lat, lon
         FROM "doc"."etvariables"
-        WHERE time_index < ?
+        WHERE time_index >= ?
         """
         cursor.execute(query, (time.time() - 86400,))
         rows = cursor.fetchall()
@@ -147,11 +147,11 @@ def main():
     df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
     
-    conn = psycopg2.connect(database="sensores_db",
-                            user="upb123",
+    conn = psycopg2.connect(database="datos_agesensors",
+                            user="postgres",
                             password="upb123",
-                            host="10.38.32.137",
-                            port="5436")
+                            host="localhost",
+                            port="5432")
 
     load_data_to_postgres(df, conn)
 

@@ -19,6 +19,8 @@ cors = CORS(app)
 app.config.from_object(Config)
 app.config['CORS_HEADERS'] = 'content-type'
 
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 with app.app_context():
     db.create_all()
 
