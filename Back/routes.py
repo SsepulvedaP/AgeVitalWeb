@@ -1,5 +1,7 @@
-from flask import Blueprint, jsonify
+import requests
+from flask import Blueprint, jsonify, request
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
+from crater_connection import update_sensor_entity_id, delete_sensor_by_entity_id
 from datetime import datetime, timedelta
 
 api = Blueprint('api', __name__)
@@ -104,3 +106,93 @@ def get_mediciones():
             'medida_promedio': medicion.medida_promedio
         })
     return jsonify(result)
+
+#nuevoooooooos
+@api.route('/sensores/<int:id_sensor>', methods=['PUT'])
+def update_sensor(id_sensor):
+    sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
+    
+    if not sensor:
+        return jsonify({"error": "Sensor no encontrado"}), 404
+
+    data = request.get_json()
+    
+    if 'nombreId' not in data:
+        return jsonify({"error": "El campo 'nombreId' es requerido para actualizar el id en Orion"}), 400
+    
+    current_entity_id = sensor.nombre
+    new_entity_id = data['nombreId']
+    
+    # Paso 1: Obtener la entidad actual de Orion
+    url_get = f'http://10.38.32.137:1026/v2/entities/{current_entity_id}'
+    response = requests.get(url_get)
+    
+    if response.status_code != 200:
+        return jsonify({"error": "No se pudo obtener la entidad de Orion"}), response.status_code
+
+    entity_data = response.json()
+
+    # Paso 2: Modificar el id de la entidad en el JSON
+    entity_data['id'] = new_entity_id
+    
+    # Paso 3: Crear la nueva entidad con el nuevo id en Orion
+    url_post = 'http://10.38.32.137:1026/v2/entities'
+    headers = {'Content-Type': 'application/json'}
+    response_post = requests.post(url_post, headers=headers, json=entity_data)
+    
+    if response_post.status_code not in [200, 201]:
+        return jsonify({"error": "No se pudo crear la entidad con el nuevo id en Orion"}), response_post.status_code
+
+    # Paso 4: Eliminar la entidad anterior en Orion
+    url_delete = f'http://10.38.32.137:1026/v2/entities/{current_entity_id}'
+    response_delete = requests.delete(url_delete)
+    
+    if response_delete.status_code != 204:
+        return jsonify({"error": "No se pudo eliminar la entidad anterior en Orion"}), response_delete.status_code
+
+    sensor.nombre = new_entity_id
+        
+    if 'longitud' in data:
+        sensor.longitud = data['longitud']
+        
+    if 'latitud' in data:
+        sensor.latitud = data['latitud']
+
+    if 'estado' in data:
+        sensor.estado = data['estado']
+
+    db.session.commit()
+
+    return jsonify({
+        'id_sensor': sensor.id_sensor,  
+        'nombre': sensor.nombre,        
+        'longitud': sensor.longitud,
+        'latitud': sensor.latitud,
+        'estado': sensor.estado
+    }), 200
+
+@api.route('/sensores/<int:id_sensor>', methods=['DELETE'])
+def delete_sensor(id_sensor):
+    sensor = db.session.query(Sensores).filter_by(id_sensor=id_sensor).first()
+    
+    if not sensor:
+        return jsonify({"error": "Sensor no encontrado"}), 404
+
+    db.session.query(Mediciones).filter_by(id_sensor=id_sensor).delete()
+    
+    db.session.delete(sensor)
+    current_entity_id =sensor.nombre
+    url_delete = f'http://10.38.32.137:1026/v2/entities/{current_entity_id}'
+    response_delete = requests.delete(url_delete)
+    
+    if response_delete.status_code != 204:
+        return jsonify({"error": "No se pudo eliminar la entidad anterior en Orion"}), response_delete.status_code
+    
+    db.session.commit()
+    
+    try:
+        delete_sensor_by_entity_id(sensor.nombre)  
+    except Exception as e:
+        return jsonify({"error": f"Error al eliminar sensor en CrateDB: {str(e)}"}), 500
+
+    return jsonify({"message": f"Sensor con id {id_sensor} eliminado correctamente"}), 200
