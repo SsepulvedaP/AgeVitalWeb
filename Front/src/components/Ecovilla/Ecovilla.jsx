@@ -4,18 +4,14 @@ import { SwipeableDrawer, Typography } from "@mui/material";
 //Components
 import { mpld3_load_lib } from "./components/mpld3_load_lib";
 import mpld3 from "mpld3";
-import json from "assets/output_1.json";
+import json from "assets/interpolaciones/interpolation_3_floor_1";
 
 //Styles
 import styles from "./Ecovilla.module.css";
 import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
-import PrimerPlanta from "assets/PrimerPlanta.png";
-import SegundaPlanta from "assets/SegundaPlanta.png";
 
 const Ecovilla = () => {
   const [pisoActual, setPisoActual] = useState("Primer Piso");
-  const ImagenPlanta =
-    pisoActual === "Primer Piso" ? PrimerPlanta : SegundaPlanta;
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);

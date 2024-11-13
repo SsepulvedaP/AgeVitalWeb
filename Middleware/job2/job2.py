@@ -67,6 +67,7 @@ def main():
 
     for tipo in df['id_tipo_medicion'].unique():
         df_filtered = df[df['id_tipo_medicion'] == tipo]
+        floor = 1
 
         points = df_filtered[['latitud', 'longitud']].values
         values = df_filtered['medida_promedio'].values
@@ -78,13 +79,15 @@ def main():
         image_path = base_path+"/Middleware/job2/"
         img = plt.imread(image_path + "PrimerPlanta.png")
 
-        plt.imshow(grid_cubic.T, extent=(6.241447, 6.241532, -75.588922, -75.588795), origin='lower')
-        plt.imshow(img, extent=(6.241447, 6.241532, -75.588922, -75.588795), aspect='equal')
+        output_path = base_path+"/Front/src/assets/interpolaciones"
+        plt.figure(figsize=(37/2.54, 11/2.54))
+        plt.imshow(grid_cubic, extent=(-75.588922, -75.588795, 6.241447, 6.241532), origin='lower')
+        plt.imshow(img, extent=(-75.588922, -75.588795, 6.241447, 6.241532), aspect='equal')
         plt.colorbar()
         fig = plt.gcf()
         fid_name = mpld3.fig_to_dict(fig)
-        output_path = base_path+"/Front/src/assets"
-        with open(output_path+f'/output_{tipo}.json', 'w') as f:
+        output_path = base_path+"/Front/src/assets/interpolaciones"
+        with open(output_path+f'/interpolation_{tipo}_floor_{floor}.json', 'w') as f:
             json.dump(fid_name, f)
         
     conn.commit()
