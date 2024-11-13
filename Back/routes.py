@@ -3,9 +3,10 @@ from flask import Blueprint, jsonify, request
 from models import Sensores, TipoMedicion, SensorMedicion, Mediciones, db
 from crater_connection import update_sensor_entity_id, delete_sensor_by_entity_id
 from datetime import datetime, timedelta
+from flask_cors import CORS
 
 api = Blueprint('api', __name__)
-
+CORS(api)
 @api.route('/globalmetrics', methods=['GET'])
 def get_global_metrics():
     now = datetime.now()
@@ -196,3 +197,103 @@ def delete_sensor(id_sensor):
         return jsonify({"error": f"Error al eliminar sensor en CrateDB: {str(e)}"}), 500
 
     return jsonify({"message": f"Sensor con id {id_sensor} eliminado correctamente"}), 200
+
+
+@api.route('/sensores', methods=['POST',  'OPTIONS'])
+def create_sensor():
+    if request.method == 'OPTIONS':
+        response = jsonify({"status": "CORS preflight"})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        return response, 200
+
+    
+    data = request.get_json()
+
+    required_fields = ['nombre', 'estado', 'latitud', 'longitud', 'tipos_medicion']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Falta el campo '{field}'"}), 400
+
+    if not isinstance(data['tipos_medicion'], list):
+        return jsonify({"error": "'tipos_medicion' debe ser una lista de IDs"}), 400
+
+    tipos_existentes = db.session.query(TipoMedicion).filter(TipoMedicion.id_tipo_medicion.in_(data['tipos_medicion'])).all()
+    if len(tipos_existentes) != len(data['tipos_medicion']):
+        return jsonify({"error": "Uno o más IDs de tipos de medición no existen"}), 400
+
+    try:
+        nuevo_sensor = Sensores(
+            nombre=data['nombre'],
+            estado=data['estado'],
+            latitud=data['latitud'],
+            longitud=data['longitud'],
+            fecha_instalacion=datetime.now()
+        )
+        db.session.add(nuevo_sensor)
+        db.session.flush() 
+        
+        for tipo_id in data['tipos_medicion']:
+            nueva_asociacion = SensorMedicion(
+                id_sensor=nuevo_sensor.id_sensor,
+                id_tipo_medicion=tipo_id
+            )
+            db.session.add(nueva_asociacion)
+
+        db.session.commit()
+        
+        entity_data = {
+            "id": data['nombre'].replace(" ", ""),  
+            "type": "variables",  
+            "dateObserved": {
+                "type": "DateTime",
+                "value": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+                "metadata": {}
+            }
+        }
+        
+        for tipo_id in data['tipos_medicion']:
+            tipo_medicion = next((tm for tm in tipos_existentes if tm.id_tipo_medicion == tipo_id), None)
+            if tipo_medicion:
+                entity_data[tipo_medicion.nombre_tipo] = {
+                    "type": "Number",  
+                    "value": 0,  
+                    "metadata": {}
+                }
+
+        url_post = 'http://10.38.32.137:1026/v2/entities'
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        response_orion = requests.post(url_post, json=entity_data, headers=headers)
+
+        if response_orion.status_code != 201:
+            return jsonify({"error": f"Error al enviar los datos a Orion: {response_orion.text}"}), 500
+
+        return jsonify({
+            "id_sensor": nuevo_sensor.id_sensor,
+            "nombre": nuevo_sensor.nombre,
+            "estado": nuevo_sensor.estado,
+            "latitud": nuevo_sensor.latitud,
+            "longitud": nuevo_sensor.longitud,
+            "fecha_instalacion": nuevo_sensor.fecha_instalacion.strftime("%Y-%m-%d %H:%M:%S"),
+            "tipos_medicion": data['tipos_medicion']
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Error al crear el sensor: {str(e)}"}), 500
+    
+    
+@api.route('/tipos_medicion', methods=['GET'])
+def get_tipos_medicion():
+    tipos_medicion = db.session.query(TipoMedicion).all()
+    result = []
+    for tipo in tipos_medicion:
+        result.append({
+            'id_tipo_medicion': tipo.id_tipo_medicion,
+            'nombre_tipo': tipo.nombre_tipo
+        })
+    return jsonify(result)
