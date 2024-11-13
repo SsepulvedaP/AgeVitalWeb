@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
 
 // Styles
 import styles from './Navbar.module.css';
@@ -63,20 +64,42 @@ const Navbar = () => {
         <NavLink to={'/tresd'}>
           <ViewInArRoundedIcon className={styles.Icon} />
         </NavLink>
-        
+
         {/* Mostrar el botón "usuarios" solo si el rol es "admin" */}
-        {userRole === "admin" && ( 
+        {userRole === "admin" && (
           <NavLink to={"/usuarios"}>
             <SensorOccupiedRoundedIcon className={styles.Icon} />
           </NavLink>
         )}
-        
+
 
         <NavLink to={'/dashboard'}>
           <DashboardRoundedIcon className={styles.Icon} />
         </NavLink>
 
-        <ExitToAppIcon className={styles.Exit} onClick={handleLogout} />
+
+
+
+        <ExitToAppIcon
+          className={styles.Exit}
+          onClick={() => {
+            const confirmButtonColor = getComputedStyle(document.documentElement).getPropertyValue('--color-principal').trim()
+            Swal.fire({
+              title: '¿Estás seguro de que deseas cerrar sesión?',
+              text: "No podrás acceder a tu cuenta hasta que inicies sesión nuevamente.",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: confirmButtonColor,
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, cerrar sesión',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                handleLogout();
+              }
+            });
+          }}
+        />
       </nav>
     </header>
   );

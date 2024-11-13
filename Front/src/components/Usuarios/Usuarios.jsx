@@ -18,6 +18,8 @@ const Usuarios = () => {
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
     const token = localStorage.getItem("access_token");
+    const buttoncolor = getComputedStyle(document.documentElement).getPropertyValue('--color-principal').trim()
+
 
     useEffect(() => {
         fetchUsers();
@@ -110,13 +112,15 @@ const Usuarios = () => {
         resetForm();
     };
 
+
+
     const handleDeleteUser = (id) => {
         Swal.fire({
             title: '¿Estás seguro?',
             text: "No podrás revertir esta acción.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
+            confirmButtonColor: buttoncolor,
             cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
