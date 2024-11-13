@@ -12,12 +12,11 @@ app = Flask(__name__)
 app.config.from_object(Config)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+# Configura CORS permitiendo solo el origen del frontend
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 db.init_app(app)
-bcrypt = Bcrypt(app)  
-jwt = JWTManager(app)  
-cors = CORS(app)
-app.config.from_object(Config)
-app.config['CORS_HEADERS'] = 'content-type'
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 with app.app_context():
     db.create_all()
