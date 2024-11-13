@@ -11,7 +11,7 @@ const Usuarios = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('Admin');
+    const [role, setRole] = useState('admin');
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
     const [newPassword, setNewPassword] = useState('');
@@ -30,24 +30,29 @@ const Usuarios = () => {
 
     const handleAddUser = async (e) => {
         e.preventDefault();
-
+    
         if (usuarios.some(user => user.email === email)) {
-            alert('El correo electrónico ya está en uso.');
+            Swal.fire('Error', 'El correo electrónico ya está en uso.', 'error');
             return;
         }
-
+    
         try {
             const newUser = await registerUser(username, email, password, role);
-            if (newUser && newUser.id) {
-                setUsuarios((prevUsuarios) => [...prevUsuarios, newUser]);
+            if (newUser && newUser.message === "Usuario registrado exitosamente") {
+                setUsuarios((prevUsuarios) => [...prevUsuarios, { username, email, role }]); // Opcionalmente puedes agregar los datos localmente
                 resetForm();
+                Swal.fire('Éxito', newUser.message, 'success');
             } else {
-                console.error("Error: Los datos de newUser son inválidos:", newUser);
+                Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
             }
         } catch (error) {
             console.error("Error al registrar usuario:", error);
+            Swal.fire('Error', 'Error al registrar usuario', 'error');
         }
     };
+    
+    
+    
 
     /*const handleEditUser = (user) => {
         setIsEditing(true);
@@ -126,7 +131,7 @@ const Usuarios = () => {
                             'success'
                         );
                     } else {
-                        //Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+                        Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
                     }
                 } catch (error) {
                     console.error("Error al intentar eliminar el usuario:", error);
@@ -177,8 +182,8 @@ const Usuarios = () => {
                         onChange={(e) => setRole(e.target.value)}
                         required
                     >
-                        <option value="Admin">admin</option>
-                        <option value="Auxiliar">user</option>
+                        <option value="admin">admin</option>
+                        <option value="user">user</option>
                     </select>
                     <button type="submit">{isEditing ? 'Actualizar' : 'Agregar'}</button>
                 </form>
