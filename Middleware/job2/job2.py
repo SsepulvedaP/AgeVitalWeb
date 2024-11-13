@@ -74,15 +74,17 @@ def main():
         grid_x, grid_y = np.mgrid[6.241447:6.241532:1000j, -75.588922:-75.588795:1000j]
         grid_cubic = griddata(points, values, (grid_x, grid_y), method='cubic')
 
-        image_path = "F:/Proyects/AgeVitalWeb/Middleware/job2"
-        img = plt.imread(image_path + "/PrimerPlanta.png")
+        base_path = Path(__file__).parent.parent.parent.as_posix()
+        image_path = base_path+"/Middleware/job2/"
+        img = plt.imread(image_path + "PrimerPlanta.png")
 
         plt.imshow(grid_cubic.T, extent=(6.241447, 6.241532, -75.588922, -75.588795), origin='lower')
-        plt.imshow(img, extent=(6.241447, 6.241532, -75.588922, -75.588795), aspect='auto')
+        plt.imshow(img, extent=(6.241447, 6.241532, -75.588922, -75.588795), aspect='equal')
         plt.colorbar()
         fig = plt.gcf()
         fid_name = mpld3.fig_to_dict(fig)
-        with open(f'output_{tipo}.json', 'w') as f:
+        output_path = base_path+"/Front/src/assets"
+        with open(output_path+f'/output_{tipo}.json', 'w') as f:
             json.dump(fid_name, f)
         
     conn.commit()
