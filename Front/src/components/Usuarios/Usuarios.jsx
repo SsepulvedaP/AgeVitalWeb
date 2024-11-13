@@ -39,7 +39,8 @@ const Usuarios = () => {
         try {
             const newUser = await registerUser(username, email, password, role);
             if (newUser && newUser.message === "Usuario registrado exitosamente") {
-                setUsuarios((prevUsuarios) => [...prevUsuarios, { username, email, role }]); // Opcionalmente puedes agregar los datos localmente
+                setUsuarios((prevUsuarios) => [...prevUsuarios, { username, email, role }]);
+                window.location.reload();
                 resetForm();
                 Swal.fire('Éxito', newUser.message, 'success');
             } else {
@@ -123,7 +124,7 @@ const Usuarios = () => {
             if (result.isConfirmed) {
                 try {
                     const response = await deleteUser(id, token);
-                    if (response && response.success) {
+                    if (response && response.message.includes('eliminado exitosamente')) {
                         setUsuarios((prevUsuarios) => prevUsuarios.filter((user) => user.id !== id));
                         Swal.fire(
                             'Eliminado!',
