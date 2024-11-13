@@ -8,7 +8,7 @@ import json from "assets/output_1.json";
 
 //Styles
 import styles from "./Ecovilla.module.css";
-import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
+import ListRoundedIcon from '@mui/icons-material/ListRounded';
 import PrimerPlanta from "assets/PrimerPlanta.png";
 import SegundaPlanta from "assets/SegundaPlanta.png";
 
@@ -26,7 +26,7 @@ const Ecovilla = () => {
   return (
     <section className={styles.Section}>
       <button onClick={toggleDrawer(true)} className={styles.toggleDrawer}>
-        <InsertChartOutlinedRoundedIcon />
+        <ListRoundedIcon />
       </button>
       <img
         src="https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg"
