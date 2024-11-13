@@ -84,6 +84,7 @@ def main():
         plt.imshow(grid_cubic, extent=(-75.588922, -75.588795, 6.241447, 6.241532), origin='lower')
         plt.imshow(img, extent=(-75.588922, -75.588795, 6.241447, 6.241532), aspect='equal')
         plt.colorbar()
+        plt.clim(df_filtered['medida_promedio'].min(), df_filtered['medida_promedio'].max())
         fig = plt.gcf()
         fid_name = mpld3.fig_to_dict(fig)
         output_path = base_path+"/Front/src/assets/interpolaciones"
