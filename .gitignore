@@ -3,6 +3,7 @@
 # dependencies
 Front/node_modules/
 Front/.vscode/
+Front/build/
 Back/__pycache__/
 Back/venv/
 
