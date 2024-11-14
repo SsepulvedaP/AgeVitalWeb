@@ -1,27 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SwipeableDrawer, Typography } from "@mui/material";
 
-//Components
+// Components
 import { mpld3_load_lib } from "./components/mpld3_load_lib";
 import mpld3 from "mpld3";
 import json from "assets/output_1.json";
 
-//Styles
+// Styles
 import styles from "./Ecovilla.module.css";
-import ListRoundedIcon from '@mui/icons-material/ListRounded';
+import ListRoundedIcon from "@mui/icons-material/ListRounded";
 import PrimerPlanta from "assets/PrimerPlanta.png";
 import SegundaPlanta from "assets/SegundaPlanta.png";
 
 const Ecovilla = () => {
   const [pisoActual, setPisoActual] = useState("Primer Piso");
-  const ImagenPlanta =
-    pisoActual === "Primer Piso" ? PrimerPlanta : SegundaPlanta;
-  const [open, setOpen] = React.useState(false);
+  const ImagenPlanta = pisoActual === "Primer Piso" ? PrimerPlanta : SegundaPlanta;
+  const [open, setOpen] = useState(false);
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
   const fig_name = "fig_el427345810798888193429725";
+
+  useEffect(() => {
+    mpld3_load_lib("https://d3js.org/d3.v5.js", function () {
+      mpld3_load_lib("https://mpld3.github.io/js/mpld3.v0.5.8.js", function () {
+        mpld3.remove_figure(fig_name);
+        mpld3.draw_figure(fig_name, json);
+      });
+    });
+  }, [fig_name]);
 
   return (
     <section className={styles.Section}>
@@ -29,22 +38,12 @@ const Ecovilla = () => {
         <ListRoundedIcon />
       </button>
       <img
-        src="https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg"
+        src={ImagenPlanta}
+        alt={pisoActual}
         className={styles.Background}
       />
       <div className={styles.Wrapper}>
         <h1>{pisoActual}</h1>
-        <script type="module">
-          {mpld3_load_lib("https://d3js.org/d3.v5.js", function ()
-          {mpld3_load_lib(
-            "https://mpld3.github.io/js/mpld3.v0.5.8.js",
-            function () {
-              mpld3.remove_figure(fig_name);
-              mpld3.draw_figure(fig_name, json);
-            }
-          )}
-          )}
-        </script>
         <div className={styles.Graph} id={fig_name}></div>
         <SwipeableDrawer
           anchor="right"
