@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import styles from './LocationCard.module.css';
-
 
 const getStatusClass = (status) => {
   switch (status) {
@@ -10,34 +9,31 @@ const getStatusClass = (status) => {
     case 'inactivo':
       return styles.inactivo; 
     case 'dañado':
-      return styles.dañado;      
+      return styles.dañado;  
+    default:
+      return ''; // Return an empty string or a default style
   }
 };
 
-const LocationCard = ({ nombreId, ubicacion, estado, imagenurl,handleOpenModal }) => {
-
-  const [open, setOpen] = useState(false);
-
+const LocationCard = ({ nombreId, ubicacion, estado, imagenurl, handleOpenModal }) => {
   const handleClickOpen = () => {
-    handleOpenModal({nombreId, ubicacion, estado, imagenurl });
-    setOpen(true);
+    handleOpenModal({ nombreId, ubicacion, estado, imagenurl });
+    // setOpen(true); // Removed if 'open' is not used
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
+
   return (
     <>    
       <Card 
-      className={styles.card} 
-      style={{ 
-        backgroundImage: `linear-gradient(to bottom, white 50%, transparent 80%), url(${imagenurl})` 
-      }}
-      onClick={handleClickOpen}
+        className={styles.card} 
+        style={{ 
+          backgroundImage: `linear-gradient(to bottom, white 50%, transparent 80%), url(${imagenurl})` 
+        }}
+        onClick={handleClickOpen}
       >
         <CardContent className={styles.cardContent}>
-        <Box className={styles.header}>
+          <Box className={styles.header}>
             <Box>
-              <Typography variant="h6" component="div">
+              <Typography variant="h10" component="div">
                 {nombreId}
               </Typography>
 
@@ -61,4 +57,3 @@ const LocationCard = ({ nombreId, ubicacion, estado, imagenurl,handleOpenModal }
 };
 
 export default LocationCard;
-

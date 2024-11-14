@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db:5432/usuarios_db
+      - SQLALCHEMY_SENSORES_DATABASE_URI=postgresql://upb123:upb123@db_sensores:5432/sensores_db
+    env_file: .env
+    depends_on:
+      - db_usuarios
+      - db_sensores
+
+  db_usuarios:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: usuarios_db
+    ports:
+      - "5435:5432" 
+    volumes:
+      - usuarios_data:/var/lib/postgresql/data
+    networks:
+      - back
+
+  db_sensores:
+    image: postgres
+    environment:
+      POSTGRES_USER: upb123
+      POSTGRES_PASSWORD: upb123
+      POSTGRES_DB: sensores_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - sensores_data:/var/lib/postgresql/data
+    networks:
+      - back
+
+networks:
+  back:
+    driver: bridge
+
+volumes:
+  usuarios_data:
+  sensores_data:
