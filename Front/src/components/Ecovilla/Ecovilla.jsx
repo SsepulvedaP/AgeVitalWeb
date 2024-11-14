@@ -34,7 +34,7 @@ const Ecovilla = () => {
   return (
     <section className={styles.Section}>
       <button onClick={toggleDrawer(true)} className={styles.toggleDrawer}>
-        <InsertChartOutlinedRoundedIcon />
+        <ListRoundedIcon />
       </button>
       <img
         src="https://www.upb.edu.co/es/imagenes/img-upbsostenibleaerea-1464235639641.jpeg"

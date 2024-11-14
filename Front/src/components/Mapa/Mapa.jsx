@@ -1,6 +1,7 @@
 //Components
 import SensorCard from "./components/Sensorcard";
 import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
+import HomeWorkRoundedIcon from '@mui/icons-material/HomeWorkRounded';
 import { NavLink } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, Popup } from "react-leaflet";
@@ -47,7 +48,7 @@ const Mapa = () => {
     <section className={styles.Wrapper}>
       <NavLink to={"/ecovilla"}>
         <button className={styles.openBocetoButton}>
-          <InsertChartOutlinedRoundedIcon />
+          <HomeWorkRoundedIcon />
         </button>
       </NavLink>
       <MapContainer

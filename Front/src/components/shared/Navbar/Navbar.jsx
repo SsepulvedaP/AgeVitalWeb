@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
 
 // Styles
 import styles from './Navbar.module.css';
@@ -12,17 +14,24 @@ import ViewInArRoundedIcon from '@mui/icons-material/ViewInArRounded';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SensorOccupiedRoundedIcon from '@mui/icons-material/SensorOccupiedRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import { TokenRounded } from '@mui/icons-material';
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null); // Estado para almacenar el rol del usuario
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // Verifica si el token está en localStorage
-    const token = localStorage.getItem('access_token');
-    setIsAuthenticated(token !== null); // Establece si el usuario está logueado
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      setIsAuthenticated(true);
+
+      // Decodificar el token para obtener el rol
+      const decodedToken = jwtDecode(token);
+      setUserRole(decodedToken.role);
+    } else {
+      setIsAuthenticated(false);
+    }
   }, []);
 
   if (!isAuthenticated) return null;
@@ -32,9 +41,8 @@ const Navbar = () => {
 
   // Función para cerrar sesión
   const handleLogout = () => {
-    // Eliminar el token del almacenamiento local
+    // Eliminar el token y el rol del almacenamiento local
     localStorage.removeItem('access_token');
-    
 
     // Redirigir al usuario a la página de login
     navigate('/');
@@ -56,14 +64,42 @@ const Navbar = () => {
         <NavLink to={'/tresd'}>
           <ViewInArRoundedIcon className={styles.Icon} />
         </NavLink>
-        <NavLink to={'/usuarios'}>
-          <SensorOccupiedRoundedIcon className={styles.Icon} />
-        </NavLink>
+
+        {/* Mostrar el botón "usuarios" solo si el rol es "admin" */}
+        {userRole === "admin" && (
+          <NavLink to={"/usuarios"}>
+            <SensorOccupiedRoundedIcon className={styles.Icon} />
+          </NavLink>
+        )}
+
+
         <NavLink to={'/dashboard'}>
           <DashboardRoundedIcon className={styles.Icon} />
         </NavLink>
 
-        <ExitToAppIcon className={styles.Exit} onClick={handleLogout} />
+
+
+
+        <ExitToAppIcon
+          className={styles.Exit}
+          onClick={() => {
+            const confirmButtonColor = getComputedStyle(document.documentElement).getPropertyValue('--color-principal').trim()
+            Swal.fire({
+              title: '¿Estás seguro de que deseas cerrar sesión?',
+              text: "No podrás acceder a tu cuenta hasta que inicies sesión nuevamente.",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: confirmButtonColor,
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sí, cerrar sesión',
+              cancelButtonText: 'Cancelar'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                handleLogout();
+              }
+            });
+          }}
+        />
       </nav>
     </header>
   );
