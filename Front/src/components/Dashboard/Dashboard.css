@@ -41,13 +41,13 @@
 
 .metric-group {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(1fr); 
     gap: 25px; 
 }
 
 .summary-section {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(3,1fr); 
     gap: 20px; 
     padding: 20px;
     justify-content: center; 
@@ -90,6 +90,39 @@
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.sensor-section {
+    display: flex;
+    flex-direction: row; /* Poner métricas y gráfico juntos en una fila */
+    gap: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.sensor-metrics {
+    flex: 1;
+}
+
+.sensor-chart {
+    flex: 1;
+}
+
+.metric-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.metric-card {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
