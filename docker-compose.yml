@@ -1,32 +1,45 @@
-version: '3.8'
+version: "3.8"
+
 services:
-  web:
-    build: .
+  backend:
+    build:
+      context: ./Back
     ports:
-      - "5000:5000"
+      - "5000:5000" # Backend Flask
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db:5432/usuarios_db
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db_usuarios:5432/usuarios_db
       - SQLALCHEMY_SENSORES_DATABASE_URI=postgresql://upb123:upb123@db_sensores:5432/sensores_db
-    env_file: .env
     depends_on:
       - db_usuarios
       - db_sensores
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: ./Front
+    ports:
+      - "5001:80" # Frontend React o Angular
+    depends_on:
+      - backend
+    networks:
+      - app_network
 
   db_usuarios:
-    image: postgres
+    image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: usuarios_db
     ports:
-      - "5435:5432" 
+      - "5435:5432"
     volumes:
       - usuarios_data:/var/lib/postgresql/data
     networks:
-      - back
+      - app_network
 
   db_sensores:
-    image: postgres
+    image: postgres:13
     environment:
       POSTGRES_USER: upb123
       POSTGRES_PASSWORD: upb123
@@ -36,10 +49,10 @@ services:
     volumes:
       - sensores_data:/var/lib/postgresql/data
     networks:
-      - back
+      - app_network
 
 networks:
-  back:
+  app_network:
     driver: bridge
 
 volumes:

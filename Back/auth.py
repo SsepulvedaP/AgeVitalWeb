@@ -49,7 +49,7 @@ def login():
 @auth_bp.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
-    users = [user.serialize() for user in users] 
+    users = [user.serialize() for user in users]
     return jsonify(users), 200
 
 
@@ -89,19 +89,19 @@ def delete_user(user_id):
     # Obtener el usuario actual (quien realiza la solicitud)
     current_user_id = get_jwt_identity()
     current_user = User.query.get(current_user_id)
-    
+
     # Verificar si el usuario es admin
     if current_user.role != 'admin':
         return jsonify({"error": "Acceso denegado: solo los administradores pueden eliminar usuarios"}), 403
 
     # Obtener el usuario a eliminar
     user_to_delete = User.query.get(user_id)
-    
+
     if not user_to_delete:
         return jsonify({"error": "Usuario no encontrado"}), 404
-    
+
     # Eliminar el usuario de la base de datos
     db.session.delete(user_to_delete)
     db.session.commit()
-    
+
     return jsonify({"message": f"Usuario con ID {user_id} eliminado exitosamente"}), 200

@@ -8,7 +8,11 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
+print("Database:", os.getenv("SQL_DATABASE"))
+print("User:", os.getenv("SQL_USER"))
+print("Password:", os.getenv("SQL_PASSWORD"))
+print("Host:", os.getenv("SQL_HOST"))
+print("Port:", os.getenv("SQL_PORT"))
 # Extracción
 def connect_to_crate():
     try:
@@ -21,7 +25,7 @@ def read_data():
     connection = connect_to_crate()
     if connection is None:
         return
-    
+
     cursor = connection.cursor()
     try:
         query = """
@@ -41,11 +45,11 @@ def clean_data(df):
     temp_valid = (df['temperatura'] >= 0) & (df['temperatura'] <= 50)
     humidity_valid = (df['humedadrelativa'] >= 0) & (df['humedadrelativa'] <= 100)
     noise_valid = (df['ruido'] >= 0) & (df['ruido'] <= 130)
-    
+
     df.loc[~temp_valid, 'temperatura'] = pd.NA
     df.loc[~humidity_valid, 'humedadrelativa'] = pd.NA
     df.loc[~noise_valid, 'ruido'] = pd.NA
-    
+
     grouped = df.groupby('entity_id').agg(
         medida_maxima_temp=pd.NamedAgg(column='temperatura', aggfunc='max'),
         medida_minima_temp=pd.NamedAgg(column='temperatura', aggfunc='min'),
@@ -59,13 +63,13 @@ def clean_data(df):
         lat = pd.NamedAgg(column='lat', aggfunc='first'),
         lon = pd.NamedAgg(column='lon', aggfunc='first')
     ).reset_index()
-    
+
     grouped = grouped.where(pd.notnull(grouped), None)
 
     return grouped
 
 # Load
-def load_data_to_postgres(df, conn):  
+def load_data_to_postgres(df, conn):
     cur = conn.cursor()
 
     tipo_medicion_map = {
@@ -73,12 +77,12 @@ def load_data_to_postgres(df, conn):
         'humedadrelativa': 'hum',
         'ruido': 'ruido',
     }
-    
+
     tipo_medicion_ids = {}
     for tipo, prefix in tipo_medicion_map.items():
         cur.execute("SELECT id_tipo_medicion FROM TipoMedicion WHERE nombre_tipo = %s", (tipo,))
         tipo_id = cur.fetchone()
-        
+
         if tipo_id is None:
             cur.execute("INSERT INTO TipoMedicion (nombre_tipo) VALUES (%s) RETURNING id_tipo_medicion", (tipo,))
             tipo_id = cur.fetchone()[0]
@@ -86,7 +90,7 @@ def load_data_to_postgres(df, conn):
         else:
             tipo_id = tipo_id[0]
             print(f"Tipo de medición '{tipo}' encontrado con id {tipo_id}")
-        
+
         tipo_medicion_ids[tipo] = tipo_id
 
     for _, row in df.iterrows():
@@ -100,7 +104,7 @@ def load_data_to_postgres(df, conn):
 
         cur.execute("SELECT id_sensor FROM Sensores WHERE nombre = %s", (nombre,))
         result = cur.fetchone()
-        
+
         if result is None:
             cur.execute("""
                 INSERT INTO Sensores (nombre, estado, latitud, longitud, fecha_instalacion)
@@ -130,7 +134,7 @@ def load_data_to_postgres(df, conn):
             avg_col = f'medida_promedio_{prefix}'
 
             if pd.notna(row[max_col]) and pd.notna(row[min_col]) and pd.notna(row[avg_col]):
-                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])              
+                values = (id_sensor, tipo_medicion_ids[measure_type], row[max_col], row[min_col], row[avg_col])
                 try:
                     cur.execute("""
                         INSERT INTO Mediciones (id_sensor, id_tipo_medicion, fecha, medida_maxima, medida_minima, medida_promedio)
@@ -147,15 +151,15 @@ def main():
     if data is None:
         print("No hay datos en crate.")
         return
-    
+
     df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
-    
-    conn = psycopg2.connect(database=os.getenv('SQL_DATABASE'),
-                            user=os.getenv('SQL_USER'),
-                            password=os.getenv('SQL_PASSWORD'),
-                            host=os.getenv('SQL_HOST'),
-                            port=os.getenv('SQL_PORT'))
+
+    conn = psycopg2.connect(database=os.getenv("SQL_DATABASE"),
+                            user=os.getenv("SQL_USER"),
+                            password=os.getenv("SQL_PASSWORD"),
+                            host=os.getenv("SQL_HOST"),
+                            port=os.getenv("SQL_PORT"))
 
     load_data_to_postgres(df, conn)
 
