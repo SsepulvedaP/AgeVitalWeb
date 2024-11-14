@@ -1,6 +1,5 @@
 //Components
 import SensorCard from "./components/Sensorcard";
-import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
 import HomeWorkRoundedIcon from '@mui/icons-material/HomeWorkRounded';
 import { NavLink } from "react-router-dom";
 import React, { useEffect, useState } from "react";
