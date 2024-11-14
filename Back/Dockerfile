@@ -8,7 +8,7 @@ WORKDIR /app
 RUN pip install --upgrade pip
 
 # Copia solo requirements.txt antes para aprovechar la caché de Docker en instalaciones futuras
-COPY requirements.txt .
+COPY requirement.txt .
 
 # Instala las dependencias
 RUN pip install -r requirement.txt
