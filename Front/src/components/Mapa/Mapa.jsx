@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Icon } from "leaflet";
+//Components
 import SensorCard from "./components/Sensorcard";
-import HomeWorkRoundedIcon from "@mui/icons-material/HomeWorkRounded";
+import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
+import HomeWorkRoundedIcon from '@mui/icons-material/HomeWorkRounded';
 import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { MapContainer, Marker, TileLayer, useMap, Popup } from "react-leaflet";
 
-// Services
+//Services
 import { getSensorData } from "services/getSensorData";
 
-// Styles
+//styles
+import { renderToString } from "react-dom/server";
 import styles from "./Mapa.module.css";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import RadioButtonCheckedRoundedIcon from '@mui/icons-material/RadioButtonCheckedRounded';
 
 const Mapa = () => {
   const [data, setData] = useState([]);
@@ -34,9 +38,11 @@ const Mapa = () => {
     return null; // Aseguramos que el componente no renderiza nada
   }
 
-  const customIcon = new Icon({
-    iconUrl: require("assets/Map_Popup_Icon.png"),
-    iconSize: [30, 45],
+  //Icons
+  const radioButtonIconHtml = renderToString(<RadioButtonCheckedRoundedIcon/>);
+  const customIcon = new L.divIcon({
+    html: radioButtonIconHtml,
+    className: styles.customIcon,
   });
 
   return (
