@@ -7,8 +7,8 @@ services:
     ports:
       - "5000:5000" # Backend Flask
     environment:
-      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@db_usuarios:5432/usuarios_db
-      - SQLALCHEMY_SENSORES_DATABASE_URI=postgresql://upb123:upb123@db_sensores:5432/sensores_db
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
+      - SQLALCHEMY_SENSORES_DATABASE_URI=${SQLALCHEMY_SENSORES_DATABASE_URI}
     depends_on:
       - db_usuarios
       - db_sensores
@@ -28,9 +28,9 @@ services:
   db_usuarios:
     image: postgres:13
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: usuarios_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_USUARIOS}
     ports:
       - "5435:5432"
     volumes:
@@ -41,9 +41,9 @@ services:
   db_sensores:
     image: postgres:13
     environment:
-      POSTGRES_USER: upb123
-      POSTGRES_PASSWORD: upb123
-      POSTGRES_DB: sensores_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_SENSORES}
     ports:
       - "5436:5432"
     volumes:
