@@ -1,30 +1,117 @@
-from flask import Flask, jsonify, request
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
-from flask_cors import CORS, cross_origin
-from config import Config
-from models import db
-from auth import auth_bp  # Importa el blueprint de autenticación
-from routes import api 
-import os 
+from flask import Blueprint, request, jsonify
+from models import db, bcrypt, User
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from datetime import timedelta
 
-app = Flask(__name__)
-app.config.from_object(Config)
-app.config['CORS_HEADERS'] = 'Content-Type'
+auth_bp = Blueprint('auth', __name__)
 
-# Configura CORS permitiendo solo el origen del frontend
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
-db.init_app(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
+#Ruta de registro de usuario
+@auth_bp.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        if not data or not all(k in data for k in ("username", "email", "password")):
+            return jsonify({"error": "Datos incompletos"}), 400
 
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({"error": "El correo electrónico ya está en uso."}), 409
 
-with app.app_context():
-    db.create_all()
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password=hashed_password,
+            role=data.get('role', 'admin')
+        )
 
-app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(api,url_prefix='/api')
+        db.session.add(new_user)
+        db.session.commit()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+        return jsonify({"message": "Usuario registrado exitosamente"}), 201
+    except Exception as e:
+        print(f"Error en el registro: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+
+# Ruta de inicio de sesión
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+
+    if user and bcrypt.check_password_hash(user.password, data['password']):
+        # Incluye el rol en el token de acceso
+        additional_claims = {"role": user.role}
+        # Establece el tiempo de expiración en 12 horas
+        access_token = create_access_token(
+            identity=user.id,
+            additional_claims=additional_claims,
+            expires_delta=timedelta(hours=12)  # Expiración de 12 horas
+        )
+        return jsonify(access_token=access_token), 200
+
+    return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+
+# Ruta para obtener todos los usuarios registrados
+@auth_bp.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    users = [user.serialize() for user in users]  # Serializar cada usuario
+    return jsonify(users), 200
+
+# Ruta para cambiar la contraseña
+@auth_bp.route('/change_password', methods=['PUT'])
+@jwt_required()
+def change_password():
+    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    # Verificar si el usuario es admin
+    if current_user.role != 'admin':
+        return jsonify({"error": "Acceso denegado"}), 403
+
+    # Validar que se haya proporcionado el ID del usuario y la nueva contraseña
+    user_id = data.get('user_id', current_user_id)  # Por defecto, cambia su propia contraseña
+    new_password = data.get('new_password')
+
+    if not new_password:
+        return jsonify({"error": "Se requiere una nueva contraseña"}), 400
+
+    # Obtener el usuario a modificar
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    # Cambiar la contraseña
+    user.set_password(new_password)
+    db.session.commit()
+
+    return jsonify({"message": "Contraseña actualizada exitosamente"}), 200
+
+# Endpoint para eliminar un usuario
+@auth_bp.route('/delete_user/<int:user_id>', methods=['DELETE'])
+@jwt_required()  # Requiere que el usuario esté autenticado
+def delete_user(user_id):
+    # Obtener el usuario actual (quien realiza la solicitud)
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    # Verificar si el usuario es admin
+    if current_user.role != 'admin':
+        return jsonify({"error": "Acceso denegado: solo los administradores pueden eliminar usuarios"}), 403
+
+    # Obtener el usuario a eliminar
+    user_to_delete = User.query.get(user_id)
+
+    if not user_to_delete:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    # Eliminar el usuario de la base de datos
+    db.session.delete(user_to_delete)
+    db.session.commit()
+
+    return jsonify({"message": f"Usuario con ID {user_id} eliminado exitosamente"}), 200
