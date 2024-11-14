@@ -1,23 +1,35 @@
-import React, { useState } from "react";
-import { SwipeableDrawer, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Button, SwipeableDrawer, Typography } from "@mui/material";
 
 //Components
 import { mpld3_load_lib } from "./components/mpld3_load_lib";
 import mpld3 from "mpld3";
-import json from "assets/interpolaciones/interpolation_1_floor_1";
 
 //Styles
 import styles from "./Ecovilla.module.css";
 import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
 
 const Ecovilla = () => {
-  const [pisoActual, setPisoActual] = useState("Primer Piso");
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
   const fig_name = "fig_el427345810798888193429725";
+  const [medida, setMedida] = useState("Temperatura");
+  const [json, setJson] = useState(require(`assets/interpolaciones/interpolation_1_floor_1`));
+  useEffect(() => {
+    if(medida === "Temperatura") { 
+      var valor = 1;
+    } else if(medida === "Humedad") {
+      var valor = 2;
+    } else {
+      var valor = 3;
+    }
+    setJson(require(`assets/interpolaciones/interpolation_${valor}_floor_1`));
+    mpld3.remove_figure(fig_name);
+    mpld3.draw_figure(fig_name, json);
+  }, [medida]);
 
   return (
     <section className={styles.Section}>
@@ -29,17 +41,17 @@ const Ecovilla = () => {
         className={styles.Background}
       />
       <div className={styles.Wrapper}>
-        <h1>{pisoActual}</h1>
+        <h1>Ecovilla</h1>
         <script type="module">
-          {mpld3_load_lib("https://d3js.org/d3.v7.js", function ()
-          {mpld3_load_lib(
-            "https://mpld3.github.io/js/mpld3.v0.5.10.js",
-            function () {
-              mpld3.remove_figure(fig_name);
-              mpld3.draw_figure(fig_name, json);
-            }
-          )}
-          )}
+          {mpld3_load_lib("https://d3js.org/d3.v7.js", function () {
+            mpld3_load_lib(
+              "https://mpld3.github.io/js/mpld3.v0.5.10.js",
+              function () {
+                mpld3.remove_figure(fig_name);
+                mpld3.draw_figure(fig_name, json);
+              }
+            );
+          })}
         </script>
         <div className={styles.Graph} id={fig_name}></div>
         <SwipeableDrawer
@@ -53,12 +65,9 @@ const Ecovilla = () => {
             keepMounted: true,
           }}
         >
-          <button onClick={() => setPisoActual("Primer Piso")}>
-            <Typography>Primer Piso</Typography>
-          </button>
-          <button onClick={() => setPisoActual("Segundo Piso")}>
-            <Typography>Segundo Piso</Typography>
-          </button>
+          <Button onClick={() => setMedida("Temperatura")} variant="text">Temperatura</Button>
+          <Button onClick={() => setMedida("Humedad")} variant="text">Humedad</Button>
+          <Button onClick={() => setMedida("Ruido")} variant="text">Ruido</Button>
         </SwipeableDrawer>
       </div>
     </section>
