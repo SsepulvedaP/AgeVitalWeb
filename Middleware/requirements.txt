@@ -1,0 +1,9 @@
+crate
+pandas
+python-dotenv
+psycopg2-binary
+numpy
+matplotlib
+mpld3
+scipy
+IPython

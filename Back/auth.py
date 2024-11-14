@@ -23,6 +23,8 @@ def register():
 
     return jsonify({"message": "Usuario registrado exitosamente"}), 201
 
+from datetime import timedelta  # Importa timedelta para establecer el tiempo de expiración
+
 # Ruta de inicio de sesión
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -30,10 +32,18 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
 
     if user and bcrypt.check_password_hash(user.password, data['password']):
-        access_token = create_access_token(identity=user.id)
+        # Incluye el rol en el token de acceso
+        additional_claims = {"role": user.role}
+        # Establece el tiempo de expiración en 12 horas
+        access_token = create_access_token(
+            identity=user.id,
+            additional_claims=additional_claims,
+            expires_delta=timedelta(hours=12)  # Expiración de 12 horas
+        )
         return jsonify(access_token=access_token), 200
 
     return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
 
 # Ruta para obtener todos los usuarios registrados
 @auth_bp.route('/users', methods=['GET'])
