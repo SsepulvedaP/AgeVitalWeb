@@ -4,11 +4,15 @@ import psycopg2
 import time
 from datetime import datetime
 import math
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Extracción
 def connect_to_crate():
     try:
-        return client.connect('http://localhost:4200', username='crate')
+        return client.connect('http://10.38.32.137:4200', username='crate')
     except Exception as e:
         print(f"Error al conectar a CrateDB: {e}")
         return None
@@ -147,11 +151,11 @@ def main():
     df = pd.DataFrame(data, columns=['entity_id', 'temperatura', 'humedadrelativa', 'ruido', 'time_index', 'lat', 'lon'])
     df = clean_data(df)
     
-    conn = psycopg2.connect(database="datos_agesensors",
-                            user="postgres",
-                            password="upb123",
-                            host="localhost",
-                            port="5432")
+    conn = psycopg2.connect(database=os.getenv('SQL_DATABASE'),
+                            user=os.getenv('SQL_USER'),
+                            password=os.getenv('SQL_PASSWORD'),
+                            host=os.getenv('SQL_HOST'),
+                            port=os.getenv('SQL_PORT'))
 
     load_data_to_postgres(df, conn)
 

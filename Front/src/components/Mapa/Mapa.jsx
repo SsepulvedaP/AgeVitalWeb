@@ -17,7 +17,7 @@ import L from "leaflet";
 import RadioButtonCheckedRoundedIcon from '@mui/icons-material/RadioButtonCheckedRounded';
 
 const Mapa = () => {
-  const [data, setData] = useState({});
+  const [data, setData] = useState([]);
   const position = [6.242391, -75.589642];
   const bounds = [
     [6.244529, -75.592128],
@@ -35,6 +35,7 @@ const Mapa = () => {
   function Boundaries() {
     const map = useMap();
     map.setMaxBounds(bounds);
+    return null; // Aseguramos que el componente no renderiza nada
   }
 
   //Icons
@@ -60,26 +61,26 @@ const Mapa = () => {
         className={styles.leafletContainer}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles courtesy of <a href="https://www.openstreetmap.cat" target="_blank">Breton OpenStreetMap Team</a>'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+            contributors, Tiles courtesy of
+            <a href="https://www.openstreetmap.cat" target="_blank">Breton OpenStreetMap Team</a>'
           url="https://tile.openstreetmap.bzh/ca/{z}/{x}/{y}.png"
         />
         {data.length > 0 &&
-          data.map(
-            (sensor) => (
-              console.log(sensor),
-              (
-                <Marker
-                  key={sensor.id_sensor}
-                  icon={customIcon}
-                  position={[sensor.latitud, sensor.longitud]}
-                >
-                  <Popup>
-                    <SensorCard sensor={sensor} />
-                  </Popup>
-                </Marker>
-              )
-            )
-          )}
+          data.map((sensor) => {
+            console.log(sensor);
+            return (
+              <Marker
+                key={sensor.id_sensor}
+                icon={customIcon}
+                position={[sensor.latitud, sensor.longitud]}
+              >
+                <Popup>
+                  <SensorCard sensor={sensor} />
+                </Popup>
+              </Marker>
+            );
+          })}
         <Boundaries />
       </MapContainer>
     </section>
