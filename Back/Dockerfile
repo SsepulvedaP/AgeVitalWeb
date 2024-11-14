@@ -1,21 +1,23 @@
-# Use a base image with Python 3.9
+# Usa una imagen base de Python
 FROM python:3.9
 
-# Set the working directory in the container
+# Establece el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Actualiza pip a la última versión
+RUN pip install --upgrade pip
+
+# Copia solo requirements.txt antes para aprovechar la caché de Docker en instalaciones futuras
+COPY requirements.txt .
+
+# Instala las dependencias
+RUN pip install -r requirement.txt
+
+# Copia el resto de los archivos de la aplicación al contenedor
 COPY . .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose the Flask port
+# Expone el puerto que usa Flask
 EXPOSE 5000
 
-# Set environment variables for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=development
-
-# Start the Flask application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+# Comando para ejecutar la aplicación
+CMD ["python", "app.py"]
