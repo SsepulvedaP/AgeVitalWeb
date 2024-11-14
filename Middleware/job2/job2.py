@@ -7,6 +7,11 @@ import mpld3
 import IPython
 import json
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 
 def get_sensors_in_bounds(conn):
@@ -44,11 +49,11 @@ def get_measurements_by_sensor_and_type(conn, sensor_id):
     return measurements
 
 def main():
-    conn = psycopg2.connect(database="datos_agesensors",
-                            user="postgres",
-                            password="upb123",
-                            host="localhost",
-                            port="5432")
+    conn = psycopg2.connect(database=os.getenv('SQL_DATABASE'),
+                            user=os.getenv('SQL_USER'),
+                            password=os.getenv('SQL_PASSWORD'),
+                            host=os.getenv('SQL_HOST'),
+                            port=os.getenv('SQL_PORT'))
 
     sensors_in_bounds = get_sensors_in_bounds(conn)
     data = []
