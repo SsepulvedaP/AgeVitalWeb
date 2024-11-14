@@ -32,11 +32,13 @@
 .status-badge.dañado {
     background-color: purple;
     color: white;
+    width: 80px;
 }
 
 .status-badge.desactivado {
     background-color: red;
     color: white;
+    width: 80px;
 }
 
   
