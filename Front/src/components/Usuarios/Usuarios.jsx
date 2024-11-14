@@ -1,62 +1,101 @@
 import React, { useEffect, useState } from 'react';
+import Swal from "sweetalert2";
 import "./Usuarios.css";
 import { getUsers } from 'services/getUsers';
 import { registerUser } from 'services/registerUser';
+import { deleteUser } from 'services/deleteUser';
+import { changePassword } from 'services/changePassword';
 
 const Usuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('Admin');
+    const [role, setRole] = useState('admin');
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [newPassword, setNewPassword] = useState('');
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-    // Obtener los usuarios al montar el componente
+    const token = localStorage.getItem("access_token");
+    const buttoncolor = getComputedStyle(document.documentElement).getPropertyValue('--color-principal').trim()
+
+
     useEffect(() => {
-        getUsers().then((data) => setUsuarios(data));
+        fetchUsers();
     }, []);
 
-    // Función para manejar el registro de un nuevo usuario
-    // Manejador de registro de usuario
-const handleAddUser = async (e) => {
-    e.preventDefault();
+    const fetchUsers = async () => {
+        const data = await getUsers();
+        setUsuarios(data);
+    };
 
-    if (usuarios.some(user => user.email === email)) {
-        alert('El correo electrónico ya está en uso.');
-        return;
-    }
-
-    console.log("Datos enviados para registro:", username, email, password, role);
-
-    try {
-        const newUser = await registerUser(username, email, password, role);
-        console.log("Respuesta del servidor:", newUser);
-
-        // Asegúrate de que newUser contiene los datos esperados
-        if (newUser && newUser.id) {
-            setUsuarios([...usuarios, { id: newUser.id, username: newUser.username, email: newUser.email, role: newUser.role }]);
-            resetForm();
-        } else {
-            console.error("Error: Los datos de newUser son inválidos:", newUser);
+    const handleAddUser = async (e) => {
+        e.preventDefault();
+    
+        if (usuarios.some(user => user.email === email)) {
+            Swal.fire('Error', 'El correo electrónico ya está en uso.', 'error');
+            return;
         }
-    } catch (error) {
-        console.error("Error al registrar usuario:", error);
-    }
-};
+    
+        try {
+            const newUser = await registerUser(username, email, password, role);
+            if (newUser && newUser.message === "Usuario registrado exitosamente") {
+                setUsuarios((prevUsuarios) => [...prevUsuarios, { username, email, role }]);
+                window.location.reload();
+                resetForm();
+                Swal.fire('Éxito', newUser.message, 'success');
+            } else {
+                Swal.fire('Error', 'Hubo un problema al registrar el usuario.', 'error');
+            }
+        } catch (error) {
+            console.error("Error al registrar usuario:", error);
+            Swal.fire('Error', 'Error al registrar usuario', 'error');
+        }
+    };
+    
+    
+    
 
-
-    // Función para cargar los datos en el formulario al editar un usuario
-    const handleEditUser = (user) => {
+    /*const handleEditUser = (user) => {
         setIsEditing(true);
         setEditId(user.id);
         setUsername(user.username);
         setEmail(user.email);
         setRole(user.role);
-        setPassword(''); // Se puede dejar vacío para que el usuario lo actualice si es necesario
+        setPassword('');
+    };*/
+
+    const handleChangePassword = async (userId) => {
+        setIsChangingPassword(true);
+        setEditId(userId);  // Guardamos el ID del usuario al que se le cambiará la contraseña
     };
 
-    // Función para manejar la actualización de un usuario
+    // Manejo del cambio de contraseña
+    const handleSubmitChangePassword = async (e) => {
+        e.preventDefault();
+
+        if (!newPassword) {
+            alert('Por favor, ingrese una nueva contraseña.');
+            return;
+        }
+
+        try {
+            const response = await changePassword(editId, newPassword, token);
+            if (response && response.message === 'Contraseña actualizada exitosamente') {
+                Swal.fire('Exito', 'Contraseña cambiada exitosamente', 'success');
+                setIsChangingPassword(false); // Cerrar formulario de cambio de contraseña
+                setNewPassword(''); // Limpiar el campo de nueva contraseña
+            } else {
+                Swal.fire('Error', 'Hubo un error al cambiar la contraseña.', 'error');
+            }
+        } catch (error) {
+            console.error("Error al cambiar la contraseña:", error);
+            Swal.fire('Error', 'Hubo un error al cambiar la contraseña.', 'error');
+        }
+    };
+    
+
     const handleUpdateUser = (e) => {
         e.preventDefault();
 
@@ -73,12 +112,40 @@ const handleAddUser = async (e) => {
         resetForm();
     };
 
-    // Función para manejar la eliminación de un usuario
+
+
     const handleDeleteUser = (id) => {
-        setUsuarios(usuarios.filter((user) => user.id !== id));
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: buttoncolor,
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await deleteUser(id, token);
+                    if (response && response.message.includes('eliminado exitosamente')) {
+                        setUsuarios((prevUsuarios) => prevUsuarios.filter((user) => user.id !== id));
+                        Swal.fire(
+                            'Eliminado!',
+                            'El usuario ha sido eliminado.',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+                    }
+                } catch (error) {
+                    console.error("Error al intentar eliminar el usuario:", error);
+                    Swal.fire('Error', 'No se pudo eliminar el usuario.', 'error');
+                }
+            }
+        });
     };
 
-    // Función para limpiar el formulario
     const resetForm = () => {
         setUsername('');
         setEmail('');
@@ -92,7 +159,6 @@ const handleAddUser = async (e) => {
         <div className="gestion">
             <h2>Gestión de Usuarios</h2>
 
-            {/* Formulario para agregar o editar usuario */}
             <div className="formulario">
                 <form onSubmit={isEditing ? handleUpdateUser : handleAddUser}>
                     <input
@@ -121,14 +187,30 @@ const handleAddUser = async (e) => {
                         onChange={(e) => setRole(e.target.value)}
                         required
                     >
-                        <option value="Admin">admin</option>
-                        <option value="Auxiliar">user</option>
+                        <option value="admin">admin</option>
+                        <option value="user">user</option>
                     </select>
                     <button type="submit">{isEditing ? 'Actualizar' : 'Agregar'}</button>
                 </form>
             </div>
 
-            {/* Tabla de usuarios */}
+            {isChangingPassword && (
+                <div className="change-password-form">
+                    <h3>Cambiar Contraseña</h3>
+                    <form onSubmit={handleSubmitChangePassword}>
+                        <input
+                            type="password"
+                            placeholder="Nueva Contraseña"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                        />
+                        <button type="submit">Actualizar Contraseña</button>
+                        <button type="button" onClick={() => setIsChangingPassword(false)}>Cancelar</button>
+                    </form>
+                </div>
+            )}
+
             <table>
                 <thead>
                     <tr>
@@ -148,7 +230,7 @@ const handleAddUser = async (e) => {
                             <td>{user.role}</td>
                             <td>
                                 <div className="button-container">
-                                    <button className="button edit" onClick={() => handleEditUser(user)}>Editar</button>
+                                    <button className="button edit" onClick={() => handleChangePassword(user.id)}>Cambiar Contraseña</button>
                                     <button className="button delete" onClick={() => handleDeleteUser(user.id)}>Eliminar</button>
                                 </div>
                             </td>
