@@ -67,6 +67,7 @@ def main():
 
     for tipo in df['id_tipo_medicion'].unique():
         df_filtered = df[df['id_tipo_medicion'] == tipo]
+        floor = 1
 
         points = df_filtered[['latitud', 'longitud']].values
         values = df_filtered['medida_promedio'].values
@@ -74,15 +75,20 @@ def main():
         grid_x, grid_y = np.mgrid[6.241447:6.241532:1000j, -75.588922:-75.588795:1000j]
         grid_cubic = griddata(points, values, (grid_x, grid_y), method='cubic')
 
-        image_path = "F:/Proyects/AgeVitalWeb/Middleware/job2"
-        img = plt.imread(image_path + "/PrimerPlanta.png")
+        base_path = Path(__file__).parent.parent.parent.as_posix()
+        image_path = base_path+"/Middleware/job2/"
+        img = plt.imread(image_path + "PrimerPlanta.png")
 
-        plt.imshow(grid_cubic.T, extent=(6.241447, 6.241532, -75.588922, -75.588795), origin='lower')
-        plt.imshow(img, extent=(6.241447, 6.241532, -75.588922, -75.588795), aspect='auto')
+        output_path = base_path+"/Front/src/assets/interpolaciones"
+        plt.figure(figsize=(37/2.54, 11/2.54))
+        plt.imshow(grid_cubic, extent=(-75.588922, -75.588795, 6.241447, 6.241532), origin='lower')
+        plt.imshow(img, extent=(-75.588922, -75.588795, 6.241447, 6.241532), aspect='equal')
         plt.colorbar()
+        plt.clim(df_filtered['medida_promedio'].min(), df_filtered['medida_promedio'].max())
         fig = plt.gcf()
         fid_name = mpld3.fig_to_dict(fig)
-        with open(f'output_{tipo}.json', 'w') as f:
+        output_path = base_path+"/Front/src/assets/interpolaciones"
+        with open(output_path+f'/interpolation_{tipo}_floor_{floor}.json', 'w') as f:
             json.dump(fid_name, f)
         
     conn.commit()

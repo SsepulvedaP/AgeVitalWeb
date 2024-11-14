@@ -58,6 +58,6 @@
     }
 }
 
-.Graph :global .mpld3-baseaxes{
-    width: 50vw;
+.Graph{
+    margin-right: 15rem;
 }
