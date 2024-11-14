@@ -1,5 +1,4 @@
 //Components
-import { Icon } from "leaflet";
 import SensorCard from "./components/Sensorcard";
 import InsertChartOutlinedRoundedIcon from "@mui/icons-material/InsertChartOutlinedRounded";
 import { NavLink } from "react-router-dom";
@@ -10,8 +9,11 @@ import { MapContainer, Marker, TileLayer, useMap, Popup } from "react-leaflet";
 import { getSensorData } from "services/getSensorData";
 
 //styles
+import { renderToString } from "react-dom/server";
 import styles from "./Mapa.module.css";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import RadioButtonCheckedRoundedIcon from '@mui/icons-material/RadioButtonCheckedRounded';
 
 const Mapa = () => {
   const [data, setData] = useState({});
@@ -34,9 +36,11 @@ const Mapa = () => {
     map.setMaxBounds(bounds);
   }
 
-  const customIcon = new Icon({
-    iconUrl: require("assets/Map_Popup_Icon.png"),
-    iconSize: [30, 45],
+  //Icons
+  const radioButtonIconHtml = renderToString(<RadioButtonCheckedRoundedIcon/>);
+  const customIcon = new L.divIcon({
+    html: radioButtonIconHtml,
+    className: styles.customIcon,
   });
 
   return (
